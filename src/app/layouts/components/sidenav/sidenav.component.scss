@@ -94,7 +94,7 @@
 }
 
 .vex-sidenav-toolbar__headline {
-  @apply text-2xl font-bold tracking-wide select-none transition-all duration-400 ease-out-swift;
+  @apply text-lg font-bold tracking-wide select-none transition-all duration-400 ease-out-swift;
   padding-inline-start: var(--vex-sidenav-item-icon-gap);
 }
 
@@ -124,7 +124,7 @@
 }
 
 .vex-sidenav-user__image {
-  @apply w-9 h-9 block rounded-full;
+  @apply w-24 h-24 block rounded-full;
 }
 
 .vex-sidenav-user__content {

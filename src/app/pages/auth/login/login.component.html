@@ -1,0 +1,106 @@
+<div class="w-full h-full bg-pattern flex flex-col items-center justify-center">
+
+    <div @fadeInUp class="card overflow-hidden w-full max-w-md">
+
+        <div class="px-1 text-right pt-1">
+            <button [matMenuTriggerFor]="languageMenu" class="rounded-full py-2 px-6 title" color="primary" mat-button
+                type="button">
+                <mat-icon *ngIf="currentLanguage == 'EN'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:united-states"></mat-icon>
+                <span *ngIf="currentLanguage == 'EN'">English</span>
+
+                <mat-icon *ngIf="currentLanguage == 'VI'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:vietnam"></mat-icon>
+                <span *ngIf="currentLanguage == 'VI'">Tiếng Việt</span>
+
+                <mat-icon *ngIf="currentLanguage == 'JP'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:japan"></mat-icon>
+                <span *ngIf="currentLanguage == 'JP'">日本語</span>
+            </button>
+        </div>
+        <mat-menu #languageMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">
+            <button mat-menu-item (click)="onLanguageMenuChange('EN')">
+                <mat-icon svgIcon="flag:united-states"></mat-icon>
+                <span>English</span>
+            </button>
+
+            <button mat-menu-item (click)="onLanguageMenuChange('VI')">
+                <mat-icon svgIcon="flag:vietnam"></mat-icon>
+                <span>Tiếng Việt</span>
+            </button>
+
+            <button mat-menu-item (click)="onLanguageMenuChange('JP')">
+                <mat-icon svgIcon="flag:japan"></mat-icon>
+                <span>日本語</span>
+            </button>
+        </mat-menu>
+
+        <div class="p-6 pb-0 flex flex-col items-center justify-center">
+            <div class="fill-current text-center">
+                <img class="w-48" src="assets/img/logo/logo.png" />
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <h2 class="title m-0">{{defaultItemName[currentLanguage]['title1']}}</h2>
+            <h4 class="body-2 text-secondary m-0">
+                {{defaultItemName[currentLanguage]['title2']}}
+            </h4>
+        </div>
+
+        <div [formGroup]="form" class="p-6 flex flex-col gap-4">
+            <div class="flex flex-col">
+                <mat-form-field class="flex-1 pt-2">
+                    <mat-label>{{defaultItemName[currentLanguage]['customerId']}}</mat-label>
+                    <input formControlName="customerId" matInput required />
+                    <mat-error
+                        *ngIf="form.controls.customerId.hasError('required')">{{defaultItemName[currentLanguage]['error']}}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="flex-1 pt-2">
+                    <mat-label>{{defaultItemName[currentLanguage]['username']}}</mat-label>
+                    <input formControlName="username" matInput required />
+                    <mat-error
+                        *ngIf="form.controls.username.hasError('required')">{{defaultItemName[currentLanguage]['error']}}
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="flex-1 pt-2">
+                    <mat-label>{{defaultItemName[currentLanguage]['password']}}</mat-label>
+                    <input [type]="inputType" formControlName="password" matInput required />
+                    <button (click)="toggleVisibility()" mat-icon-button matIconSuffix matTooltip="Toggle Visibility"
+                        type="button">
+                        <mat-icon *ngIf="visible" svgIcon="mat:visibility"></mat-icon>
+                        <mat-icon *ngIf="!visible" svgIcon="mat:visibility_off"></mat-icon>
+                    </button>
+                    <mat-hint>{{defaultItemName[currentLanguage]['inputType']}}</mat-hint>
+                    <mat-error
+                        *ngIf="form.controls.password.hasError('required')">{{defaultItemName[currentLanguage]['error']}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <!-- <mat-checkbox class="caption" color="primary">Remember Me</mat-checkbox> -->
+                <a [routerLink]="['/forgot-password']"
+                    class="caption">{{defaultItemName[currentLanguage]['forgotpassword']}}</a>
+            </div>
+
+            <button (click)="send()" color="primary" mat-raised-button type="button">
+                {{defaultItemName[currentLanguage]['loginbtn']}}
+            </button>
+
+            <p class="text-secondary text-center">
+                {{defaultItemName[currentLanguage]['registerTitle1']}}<br />
+                <a [routerLink]="['/register']">{{defaultItemName[currentLanguage]['registerTitle2']}}</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- CONFIGPANEL -->
+    <vex-config-panel-toggle
+    (openConfig)="configpanel.open()"></vex-config-panel-toggle>
+    <vex-sidebar #configpanel [invisibleBackdrop]="true" [opened]="!!(configPanelOpen$ | async)" position="right">
+        <vex-config-panel></vex-config-panel>
+    </vex-sidebar>
+    <!-- END CONFIGPANEL -->
+</div>

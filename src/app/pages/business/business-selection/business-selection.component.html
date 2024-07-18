@@ -1,0 +1,87 @@
+<vex-base-layout *ngIf="config$ | async as config">
+    <vex-progress-bar></vex-progress-bar>
+    <div @scaleFadeIn>
+
+
+        <div class="px-1 text-right pt-1">
+            <button [matMenuTriggerFor]="userMenu" class="rounded-full py-2 px-6 title" color="primary" mat-button
+                type="button">
+                <img src="../../../../assets/img/avatars/1.jpg" alt="Image"
+                    class="rounded-full w-[1.75rem] inline-block">
+                <span class="pl-2">Chọng kun</span>
+            </button>
+            <button [matMenuTriggerFor]="languageMenu" class="rounded-full py-2 px-6 title" color="primary" mat-button
+                type="button">
+                <mat-icon *ngIf="currentLanguage == 'EN'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:united-states"></mat-icon>
+                <span *ngIf="currentLanguage == 'EN'">English</span>
+
+                <mat-icon *ngIf="currentLanguage == 'VI'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:vietnam"></mat-icon>
+                <span *ngIf="currentLanguage == 'VI'">Tiếng Việt</span>
+
+                <mat-icon *ngIf="currentLanguage == 'JP'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:japan"></mat-icon>
+                <span *ngIf="currentLanguage == 'JP'">日本語</span>
+            </button>
+        </div>
+        <mat-menu #languageMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">
+            <button mat-menu-item (click)="onLanguageMenuChange('EN')">
+                <mat-icon svgIcon="flag:united-states"></mat-icon>
+                <span>English</span>
+            </button>
+
+            <button mat-menu-item (click)="onLanguageMenuChange('VI')">
+                <mat-icon svgIcon="flag:vietnam"></mat-icon>
+                <span>Tiếng Việt</span>
+            </button>
+
+            <button mat-menu-item (click)="onLanguageMenuChange('JP')">
+                <mat-icon svgIcon="flag:japan"></mat-icon>
+                <span>日本語</span>
+            </button>
+        </mat-menu>
+        <mat-menu #userMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">
+            <button mat-menu-item (click)="logout()">
+                <mat-icon class="icon-sm" svgIcon="mat:settings"></mat-icon>
+                <span>Account settings</span>
+            </button>
+            <div class="border-b border-divider mx-4"></div>
+            <button mat-menu-item (click)="logout()">
+                <mat-icon class="icon-sm" svgIcon="mat:logout"></mat-icon>
+                <span>Sign out</span>
+            </button>
+        </mat-menu>
+    </div>
+    <div class="overflow-y-auto flex-auto md:flex justify-center items-center" @scaleFadeIn>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 container">
+            <div *ngFor="let element of businessList" class="h-full">
+                <div class="mat-card-custom card cursor-pointer" matRipple matRippleColor="rgb(var(--vex-color-primary-600) / 0.1)" (click)="businessClick(element)">
+                    <mat-card class="custom-card hover:shadow-inner" appearance="outlined">
+                        <mat-card-content>
+                            <div class="flex justify-between items-center">
+                                <div class="inline-block half-circle text-white" [class]="element['bgColor']">
+                                    <div class="w-full h-full flex justify-between items-center">
+                                        <mat-icon svgIcon="mat:arrow_right" class="icon-custom"></mat-icon>
+                                    </div>
+                                </div>
+                                <div class="inline-block w-full">
+                                    <p class="text-center font-bold md:text-xl sm:text-base"
+                                        [innerHtml]="element['businessName']"></p>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+    </div>
+    <vex-footer *ngIf="config.footer.visible" class="vex-footer"></vex-footer>
+
+    <!-- CONFIGPANEL -->
+    <vex-config-panel-toggle (openConfig)="configpanel.open()"></vex-config-panel-toggle>
+    <vex-sidebar #configpanel [invisibleBackdrop]="true" [opened]="!!(configPanelOpen$ | async)" position="right">
+        <vex-config-panel></vex-config-panel>
+    </vex-sidebar>
+    <!-- END CONFIGPANEL -->
+</vex-base-layout>

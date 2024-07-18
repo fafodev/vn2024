@@ -1,0 +1,34 @@
+.custom-card {
+    .content-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px; // Khoảng cách giữa các cột
+    }
+
+    .column {
+        padding: 10px;
+    }
+
+    .title {
+        font-size: 16px;
+        color: red;
+    }
+
+    .left-icon {
+        color: white;
+    }
+
+    .half-circle {
+        width: 30px;
+        height: 60px;
+        border-radius: 0px 30px 30px 0;
+        margin-left: -17px;
+    }
+
+    .icon-custom {
+        font-size: 3.5rem !important;
+        height: 3.5rem !important;
+        width: 3.5rem !important;
+        line-height: 3.5rem !important;
+    }
+}

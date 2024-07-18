@@ -26,6 +26,7 @@
     "@angular/router": "^17.0.9",
     "@material-design-icons/svg": "^0.14.13",
     "@ngneat/falso": "^7.1.1",
+    "@ngrx/store": "^17.2.0",
     "@ngx-loading-bar/core": "^6.0.2",
     "@ngx-loading-bar/router": "^6.0.2",
     "angular-calendar": "~0.31.0",

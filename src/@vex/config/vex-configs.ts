@@ -27,12 +27,12 @@ const baseConfig: VexConfig = {
     }
   },
   direction: 'ltr',
-  imgSrc: '//vex-landing.visurel.com/assets/img/layouts/apollo.png',
+  imgSrc: './assets/img/layouts/apollo.png',
   layout: 'horizontal',
   boxed: false,
   sidenav: {
-    title: 'VIJP',
-    imageUrl: 'assets/img/logo/logo.svg',
+    title: '業務管理システム',
+    imageUrl: 'assets/img/logo/logo.png',
     showCollapsePin: true,
     user: {
       visible: true
@@ -63,7 +63,7 @@ export const vexConfigs: VexConfigs = {
     id: VexConfigName.poseidon,
     name: 'Poseidon',
     bodyClass: 'vex-layout-poseidon',
-    imgSrc: '//vex-landing.visurel.com/assets/img/layouts/poseidon.png',
+    imgSrc: './assets/img/layouts/poseidon.png',
     sidenav: {
       user: {
         visible: true
@@ -82,7 +82,7 @@ export const vexConfigs: VexConfigs = {
     id: VexConfigName.hermes,
     name: 'Hermes',
     bodyClass: 'vex-layout-hermes',
-    imgSrc: '//vex-landing.visurel.com/assets/img/layouts/hermes.png',
+    imgSrc: './assets/img/layouts/hermes.png',
     layout: 'vertical',
     boxed: true,
     sidenav: {
@@ -104,7 +104,7 @@ export const vexConfigs: VexConfigs = {
     id: VexConfigName.ares,
     name: 'Ares',
     bodyClass: 'vex-layout-ares',
-    imgSrc: '//vex-landing.visurel.com/assets/img/layouts/ares.png',
+    imgSrc: './assets/img/layouts/ares.png',
     sidenav: {
       user: {
         visible: false
@@ -127,7 +127,7 @@ export const vexConfigs: VexConfigs = {
     id: VexConfigName.zeus,
     name: 'Zeus',
     bodyClass: 'vex-layout-zeus',
-    imgSrc: '//vex-landing.visurel.com/assets/img/layouts/zeus.png',
+    imgSrc: './assets/img/layouts/zeus.png',
     sidenav: {
       state: 'collapsed'
     }
@@ -136,7 +136,7 @@ export const vexConfigs: VexConfigs = {
     id: VexConfigName.ikaros,
     name: 'Ikaros',
     bodyClass: 'vex-layout-ikaros',
-    imgSrc: '//vex-landing.visurel.com/assets/img/layouts/ikaros.png',
+    imgSrc: './assets/img/layouts/ikaros.png',
     layout: 'vertical',
     boxed: true,
     sidenav: {

@@ -1,10 +1,10 @@
 import {
-  Component,
-  DestroyRef,
-  ElementRef,
-  HostBinding,
-  inject,
-  OnInit
+    Component,
+    DestroyRef,
+    ElementRef,
+    HostBinding,
+    inject,
+    OnInit
 } from '@angular/core';
 import { VexLayoutService } from '@vex/services/vex-layout.service';
 import { VexConfigService } from '@vex/config/vex-config.service';
@@ -27,114 +27,114 @@ import { checkRouterChildsData } from '@vex/utils/check-router-childs-data';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'vex-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss'],
-  standalone: true,
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    NgIf,
-    RouterLink,
-    MatMenuModule,
-    NgClass,
-    NgFor,
-    NavigationItemComponent,
-    ToolbarNotificationsComponent,
-    ToolbarUserComponent,
-    NavigationComponent,
-    AsyncPipe
-  ]
+    selector: 'vex-toolbar',
+    templateUrl: './toolbar.component.html',
+    styleUrls: ['./toolbar.component.scss'],
+    standalone: true,
+    imports: [
+        MatButtonModule,
+        MatIconModule,
+        NgIf,
+        RouterLink,
+        MatMenuModule,
+        NgClass,
+        NgFor,
+        NavigationItemComponent,
+        ToolbarNotificationsComponent,
+        ToolbarUserComponent,
+        NavigationComponent,
+        AsyncPipe
+    ]
 })
 export class ToolbarComponent implements OnInit {
-  @HostBinding('class.shadow-b')
-  showShadow: boolean = false;
+    @HostBinding('class.shadow-b')
+    showShadow: boolean = false;
 
-  navigationItems$: Observable<NavigationItem[]> =
-    this.navigationService.items$;
+    navigationItems$: Observable<NavigationItem[]> =
+        this.navigationService.items$;
 
-  isHorizontalLayout$: Observable<boolean> = this.configService.config$.pipe(
-    map((config) => config.layout === 'horizontal')
-  );
-  isVerticalLayout$: Observable<boolean> = this.configService.config$.pipe(
-    map((config) => config.layout === 'vertical')
-  );
-  isNavbarInToolbar$: Observable<boolean> = this.configService.config$.pipe(
-    map((config) => config.navbar.position === 'in-toolbar')
-  );
-  isNavbarBelowToolbar$: Observable<boolean> = this.configService.config$.pipe(
-    map((config) => config.navbar.position === 'below-toolbar')
-  );
-  userVisible$: Observable<boolean> = this.configService.config$.pipe(
-    map((config) => config.toolbar.user.visible)
-  );
-  title$: Observable<string> = this.configService.select(
-    (config) => config.sidenav.title
-  );
-
-  isDesktop$: Observable<boolean> = this.layoutService.isDesktop$;
-  megaMenuOpen$: Observable<boolean> = of(false);
-  private readonly destroyRef: DestroyRef = inject(DestroyRef);
-
-  constructor(
-    private readonly layoutService: VexLayoutService,
-    private readonly configService: VexConfigService,
-    private readonly navigationService: NavigationService,
-    private readonly popoverService: VexPopoverService,
-    private readonly router: Router
-  ) {}
-
-  ngOnInit() {
-    this.router.events
-      .pipe(
-        filter((event) => event instanceof NavigationEnd),
-        startWith(null),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.showShadow = checkRouterChildsData(
-          this.router.routerState.root.snapshot,
-          (data) => data.toolbarShadowEnabled ?? false
-        );
-      });
-  }
-
-  openQuickpanel(): void {
-    this.layoutService.openQuickpanel();
-  }
-
-  openSidenav(): void {
-    this.layoutService.openSidenav();
-  }
-
-  openMegaMenu(origin: ElementRef | HTMLElement): void {
-    this.megaMenuOpen$ = of(
-      this.popoverService.open({
-        content: MegaMenuComponent,
-        origin,
-        offsetY: 12,
-        position: [
-          {
-            originX: 'start',
-            originY: 'bottom',
-            overlayX: 'start',
-            overlayY: 'top'
-          },
-          {
-            originX: 'end',
-            originY: 'bottom',
-            overlayX: 'end',
-            overlayY: 'top'
-          }
-        ]
-      })
-    ).pipe(
-      switchMap((popoverRef) => popoverRef.afterClosed$.pipe(map(() => false))),
-      startWith(true)
+    isHorizontalLayout$: Observable<boolean> = this.configService.config$.pipe(
+        map((config) => config.layout === 'horizontal')
     );
-  }
+    isVerticalLayout$: Observable<boolean> = this.configService.config$.pipe(
+        map((config) => config.layout === 'vertical')
+    );
+    isNavbarInToolbar$: Observable<boolean> = this.configService.config$.pipe(
+        map((config) => config.navbar.position === 'in-toolbar')
+    );
+    isNavbarBelowToolbar$: Observable<boolean> = this.configService.config$.pipe(
+        map((config) => config.navbar.position === 'below-toolbar')
+    );
+    userVisible$: Observable<boolean> = this.configService.config$.pipe(
+        map((config) => config.toolbar.user.visible)
+    );
+    title$: Observable<string> = this.configService.select(
+        (config) => config.sidenav.title
+    );
 
-  openSearch(): void {
-    this.layoutService.openSearch();
-  }
+    isDesktop$: Observable<boolean> = this.layoutService.isDesktop$;
+    megaMenuOpen$: Observable<boolean> = of(false);
+    private readonly destroyRef: DestroyRef = inject(DestroyRef);
+
+    constructor(
+        private readonly layoutService: VexLayoutService,
+        private readonly configService: VexConfigService,
+        private readonly navigationService: NavigationService,
+        private readonly popoverService: VexPopoverService,
+        private readonly router: Router
+    ) { }
+
+    ngOnInit() {
+        this.router.events
+            .pipe(
+                filter((event) => event instanceof NavigationEnd),
+                startWith(null),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe(() => {
+                this.showShadow = checkRouterChildsData(
+                    this.router.routerState.root.snapshot,
+                    (data) => data.toolbarShadowEnabled ?? false
+                );
+            });
+    }
+
+    openQuickpanel(): void {
+        this.layoutService.openQuickpanel();
+    }
+
+    openSidenav(): void {
+        this.layoutService.openSidenav();
+    }
+
+    openMegaMenu(origin: ElementRef | HTMLElement): void {
+        this.megaMenuOpen$ = of(
+            this.popoverService.open({
+                content: MegaMenuComponent,
+                origin,
+                offsetY: 12,
+                position: [
+                    {
+                        originX: 'start',
+                        originY: 'bottom',
+                        overlayX: 'start',
+                        overlayY: 'top'
+                    },
+                    {
+                        originX: 'end',
+                        originY: 'bottom',
+                        overlayX: 'end',
+                        overlayY: 'top'
+                    }
+                ]
+            })
+        ).pipe(
+            switchMap((popoverRef) => popoverRef.afterClosed$.pipe(map(() => false))),
+            startWith(true)
+        );
+    }
+
+    openSearch(): void {
+        this.layoutService.openSearch();
+    }
 }
