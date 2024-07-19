@@ -69,7 +69,7 @@
 
     <div *ngIf="(isVerticalLayout$ | async) && (isNavbarInToolbar$ | async)" [class.hidden]="!(isDesktop$ | async)"
         class="px-6 flex-none flex items-center">
-        <vex-navigation-item *ngFor="let item of navigationItems$ | async" [item]="item"></vex-navigation-item>
+        <vex-navigation-item class="custom-nav-item" *ngFor="let item of navigationItems$ | async" [item]="item"></vex-navigation-item>
     </div>
 
     <span class="flex-1"></span>
@@ -91,25 +91,40 @@
             </button>
         </div>
 
-        <div class="px-1">
-            <button [matMenuTriggerFor]="languageMenu" mat-icon-button type="button">
-                <mat-icon svgIcon="flag:united-states"></mat-icon>
-            </button>
-        </div>
-
         <div *ngIf="userVisible$ | async" class="px-1">
             <vex-toolbar-user></vex-toolbar-user>
         </div>
 
+        <div class="px-1">
+            <button [matMenuTriggerFor]="languageMenu" class="rounded-full py-2 px-6 title" color="primary" mat-button
+                type="button">
+                <mat-icon *ngIf="currentLanguage == 'EN'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:united-states"></mat-icon>
+                <span *ngIf="currentLanguage == 'EN'">English</span>
+
+                <mat-icon *ngIf="currentLanguage == 'VI'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:vietnam"></mat-icon>
+                <span *ngIf="currentLanguage == 'VI'">Tiếng Việt</span>
+
+                <mat-icon *ngIf="currentLanguage == 'JP'" class="ltr:-ml-2 rtl:-mr-2 ltr:mr-2 rtl:ml-2 !icon-lg"
+                    svgIcon="flag:japan"></mat-icon>
+                <span *ngIf="currentLanguage == 'JP'">日本語</span>
+            </button>
+        </div>
         <mat-menu #languageMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">
-            <button mat-menu-item>
+            <button mat-menu-item (click)="onLanguageMenuChange('EN')">
                 <mat-icon svgIcon="flag:united-states"></mat-icon>
                 <span>English</span>
             </button>
 
-            <button mat-menu-item>
-                <mat-icon svgIcon="flag:germany"></mat-icon>
-                <span>German</span>
+            <button mat-menu-item (click)="onLanguageMenuChange('VI')">
+                <mat-icon svgIcon="flag:vietnam"></mat-icon>
+                <span>Tiếng Việt</span>
+            </button>
+
+            <button mat-menu-item (click)="onLanguageMenuChange('JP')">
+                <mat-icon svgIcon="flag:japan"></mat-icon>
+                <span>日本語</span>
             </button>
         </mat-menu>
     </div>

@@ -1,5 +1,6 @@
 import {
     Component,
+    OnInit,
     TemplateRef,
     ViewChild,
     ViewEncapsulation
@@ -38,6 +39,8 @@ import { VexScrollbarComponent } from '@vex/components/vex-scrollbar/vex-scrollb
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
+import { NavigationLoaderService } from 'src/app/core/navigation/navigation-loader.service';
 
 const colors: any = {
     blue: {
@@ -84,7 +87,7 @@ const colors: any = {
         CalendarA11y
     ]
 })
-export class TopComponent {
+export class TopComponent implements OnInit {
     @ViewChild('modalContent', { static: true }) modalContent?: TemplateRef<any>;
 
     view: CalendarView = CalendarView.Month;
@@ -154,8 +157,14 @@ export class TopComponent {
 
     constructor(
         private dialog: MatDialog,
-        private snackbar: MatSnackBar
-    ) { }
+        private snackbar: MatSnackBar,
+        private navigationLoaderService: NavigationLoaderService,
+    ) {
+        
+    }
+    ngOnInit(): void {
+
+    }
 
     dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
         if (isSameMonth(date, this.viewDate)) {
@@ -227,4 +236,7 @@ export class TopComponent {
     closeOpenMonthViewDay() {
         this.activeDayIsOpen = false;
     }
+
+
+
 }

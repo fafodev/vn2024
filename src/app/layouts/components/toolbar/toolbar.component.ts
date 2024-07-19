@@ -25,6 +25,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { NavigationItem } from '../../../core/navigation/navigation-item.interface';
 import { checkRouterChildsData } from '@vex/utils/check-router-childs-data';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Store } from '@ngrx/store';
+import { selectCurrentLanguage } from 'src/app/state/language/language.selectors';
+import { setLanguage } from 'src/app/state/language/language.actions';
+import { NavigationLoaderService } from 'src/app/core/navigation/navigation-loader.service';
+import { AppFunctionService } from 'src/app/services/app-function.service';
 
 @Component({
     selector: 'vex-toolbar',
@@ -47,11 +52,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     ]
 })
 export class ToolbarComponent implements OnInit {
+    currentLanguage$: Observable<string>;
+    currentLanguage: string = "";
+
     @HostBinding('class.shadow-b')
     showShadow: boolean = false;
 
-    navigationItems$: Observable<NavigationItem[]> =
-        this.navigationService.items$;
+    navigationItems$: Observable<NavigationItem[]> = this.navigationService.items$;
 
     isHorizontalLayout$: Observable<boolean> = this.configService.config$.pipe(
         map((config) => config.layout === 'horizontal')
@@ -81,8 +88,16 @@ export class ToolbarComponent implements OnInit {
         private readonly configService: VexConfigService,
         private readonly navigationService: NavigationService,
         private readonly popoverService: VexPopoverService,
-        private readonly router: Router
-    ) { }
+        private readonly store: Store,
+        private readonly router: Router,
+        private readonly appFunctionService: AppFunctionService
+    ) {
+        this.currentLanguage$ = this.store.select(selectCurrentLanguage);
+        this.currentLanguage$.subscribe(language => {
+            this.currentLanguage = language;
+        });
+        this.appFunctionService.reloadListFunction();
+    }
 
     ngOnInit() {
         this.router.events
@@ -136,5 +151,13 @@ export class ToolbarComponent implements OnInit {
 
     openSearch(): void {
         this.layoutService.openSearch();
+    }
+
+    onLanguageMenuChange(language: string) {
+        this.currentLanguage = language;
+        this.store.dispatch(setLanguage({ language }));
+        
+        // reload menu
+        this.appFunctionService.reloadListFunction();
     }
 }
