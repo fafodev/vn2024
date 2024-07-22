@@ -26,6 +26,9 @@ import { VexLayoutService } from '@vex/services/vex-layout.service';
 import { VexConfigService } from '@vex/config/vex-config.service';
 import { VexSidebarComponent } from '@vex/components/vex-sidebar/vex-sidebar.component';
 import { ConfigPanelToggleComponent } from 'src/app/layouts/components/config-panel/config-panel-toggle/config-panel-toggle.component';
+import { WebServiceService } from 'src/app/services/web-service.service';
+import { AccessInfoService } from 'src/app/services/access-info.service';
+import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-progress-bar.component';
 
 @Component({
     selector: 'vex-login',
@@ -49,7 +52,8 @@ import { ConfigPanelToggleComponent } from 'src/app/layouts/components/config-pa
         ConfigPanelComponent,
         VexSidebarComponent,
         ConfigPanelToggleComponent,
-        AsyncPipe
+        AsyncPipe,
+        VexProgressBarComponent
     ]
 })
 export class LoginComponent {
@@ -75,22 +79,57 @@ export class LoginComponent {
         private snackbar: MatSnackBar,
         private store: Store,
         private readonly layoutService: VexLayoutService,
-        private readonly configService: VexConfigService
+        private readonly configService: VexConfigService,
+        private readonly webService: WebServiceService,
+        private readonly accessInfo: AccessInfoService
     ) {
         this.currentLanguage$ = this.store.select(selectCurrentLanguage);
         this.currentLanguage$.subscribe(language => {
             this.currentLanguage = language;
         });
     }
-    
+
     onLanguageMenuChange(language: string) {
         this.currentLanguage = language;
         this.store.dispatch(setLanguage({ language }));
     }
 
-    send() {
+    btnLoginClick() {
         if (this.form.valid) {
-            this.router.navigate(['/business-selection']);
+            let request = {
+                accessInfo: this.accessInfo.getAll(),
+                "id": 1,
+                "value": 2,
+                "remark": 3,
+            };
+
+            this.webService.callWs('checkLogin', request).subscribe({
+                next: (data) => {
+                    if (data) {
+                        console.log('Data received:', data);
+                        // Xử lý dữ liệu thành công ở đây
+                        if (data.fatalError.length > 0) {
+                            // Xử lý lỗi hệ thống
+                            //console.error('Fatal Error:', data.fatalError);
+                        } else {
+                            // Xử lý dữ liệu bình thường
+                            console.log('Response Data:', data);
+                        }
+                    } else {
+                        console.log('No data received or there was an error.');
+                    }
+                },
+                error: (error) => {
+                    console.error('Error occurred:', error);
+                    // Xử lý lỗi ở đây
+                },
+                complete: () => {
+                    console.log('Request completed.');
+                }
+            });
+
+
+
             // this.snackbar.open(
             //     "Lucky you! Looks like you didn't need a password or username address! For a real application we provide validators to prevent this. ;)",
             //     'THANKS',

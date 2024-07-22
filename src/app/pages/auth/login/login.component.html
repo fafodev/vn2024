@@ -1,5 +1,5 @@
 <div class="w-full h-full bg-pattern flex flex-col items-center justify-center">
-
+    <vex-progress-bar></vex-progress-bar>
     <div @fadeInUp class="card overflow-hidden w-full max-w-md">
 
         <div class="px-1 text-right pt-1">
@@ -85,7 +85,7 @@
                     class="caption">{{defaultItemName[currentLanguage]['forgotpassword']}}</a>
             </div>
 
-            <button (click)="send()" color="primary" mat-raised-button type="button">
+            <button (click)="btnLoginClick()" color="primary" mat-raised-button type="button">
                 {{defaultItemName[currentLanguage]['loginbtn']}}
             </button>
 
