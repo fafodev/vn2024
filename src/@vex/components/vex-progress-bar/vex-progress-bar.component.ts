@@ -6,7 +6,7 @@ import {
   LoadingBarService
 } from '@ngx-loading-bar/core';
 import { delayWhen, interval, Observable, of } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
 
@@ -20,7 +20,8 @@ import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
     MatProgressBarModule,
     LoadingBarModule,
     LoadingBarRouterModule,
-    AsyncPipe
+    AsyncPipe,
+    NgIf
   ],
   providers: [
     {
