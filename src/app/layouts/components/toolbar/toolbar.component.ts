@@ -96,7 +96,6 @@ export class ToolbarComponent implements OnInit {
         this.currentLanguage$.subscribe(language => {
             this.currentLanguage = language;
         });
-        this.appFunctionService.reloadListFunction();
     }
 
     ngOnInit() {
@@ -156,7 +155,7 @@ export class ToolbarComponent implements OnInit {
     onLanguageMenuChange(language: string) {
         this.currentLanguage = language;
         this.store.dispatch(setLanguage({ language }));
-        
+
         // reload menu
         this.appFunctionService.reloadListFunction();
     }

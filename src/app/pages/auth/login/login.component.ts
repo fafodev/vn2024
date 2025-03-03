@@ -29,6 +29,8 @@ import { ConfigPanelToggleComponent } from 'src/app/layouts/components/config-pa
 import { WebServiceService } from 'src/app/services/web-service.service';
 import { AccessInfoService } from 'src/app/services/access-info.service';
 import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-progress-bar.component';
+import { AppFunctionService } from 'src/app/services/app-function.service';
+import { NotifyService } from 'src/app/services/notify.service';
 
 @Component({
     selector: 'vex-login',
@@ -81,7 +83,10 @@ export class LoginComponent {
         private readonly layoutService: VexLayoutService,
         private readonly configService: VexConfigService,
         private readonly webService: WebServiceService,
-        private readonly accessInfo: AccessInfoService
+        private readonly accessInfo: AccessInfoService,
+        private appFunctionService: AppFunctionService,
+        private notifyService: NotifyService
+
     ) {
         this.currentLanguage$ = this.store.select(selectCurrentLanguage);
         this.currentLanguage$.subscribe(language => {
@@ -97,46 +102,30 @@ export class LoginComponent {
     btnLoginClick() {
         if (this.form.valid) {
             let request = {
-                accessInfo: this.accessInfo.getAll(),
-                "id": 1,
-                "value": 2,
-                "remark": 3,
+                accessInfo: {
+                    "customerId": this.form.get('customerId')!.value,
+                    "username": this.form.get('username')!.value,
+                    "language": this.currentLanguage
+                },
+                password: this.form.get('password')!.value
             };
 
-            this.webService.callWs('checkLogin', request).subscribe({
-                next: (data) => {
-                    if (data) {
-                        console.log('Data received:', data);
-                        // Xử lý dữ liệu thành công ở đây
-                        if (data.fatalError.length > 0) {
-                            // Xử lý lỗi hệ thống
-                            //console.error('Fatal Error:', data.fatalError);
-                        } else {
-                            // Xử lý dữ liệu bình thường
-                            console.log('Response Data:', data);
-                        }
-                    } else {
-                        console.log('No data received or there was an error.');
+            this.webService.callWs('checkLogin', request,
+                (response) => {
+                    if (response.isLogin) {
+                        this.accessInfo.username = this.form.get('username')!.value;
+                        this.accessInfo.token = response.token;
+                        this.accessInfo.customerId = this.form.get('customerId')!.value;
+                        this.accessInfo.language = this.currentLanguage;
+                        this.accessInfo.name = response.name;
+                        this.appFunctionService.reloadListFunction();
                     }
+
+                    this.router.navigate(['/dashboards']);
                 },
-                error: (error) => {
-                    console.error('Error occurred:', error);
-                    // Xử lý lỗi ở đây
-                },
-                complete: () => {
-                    console.log('Request completed.');
-                }
-            });
-
-
-
-            // this.snackbar.open(
-            //     "Lucky you! Looks like you didn't need a password or username address! For a real application we provide validators to prevent this. ;)",
-            //     'THANKS',
-            //     {
-            //         duration: 10000
-            //     }
-            // );
+                () => {
+                    console.error('Error occurred');
+                }).subscribe();
         } else {
             console.log(this.form.valid)
         }
@@ -154,4 +143,30 @@ export class LoginComponent {
             this.cd.markForCheck();
         }
     }
+    showInfo() {
+        this.notifyService.info('This is an info message', () => {
+            console.log('Info OK clicked');
+        });
+    }
+
+    showError() {
+        this.notifyService.error('This is an error message', () => {
+            console.log('Error OK clicked');
+        });
+    }
+
+    showWarning() {
+        this.notifyService.warning('This is a warning message', () => {
+            console.log('Warning OK clicked');
+        });
+    }
+
+    showConfirm() {
+        this.notifyService.confirm('Are you sure?', () => {
+            console.log('Confirm OK clicked');
+        }, () => {
+            console.log('Confirm Cancel clicked');
+        });
+    }
+
 }

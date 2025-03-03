@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { isDevMode } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { AccessInfoService } from './access-info.service';
 import { IObjectString } from '../app.interface';
 import { LoadingBarService } from '@ngx-loading-bar/core';
 import { LoadingBarState } from '@ngx-loading-bar/core/loading-bar.state';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Injectable({
     providedIn: 'root'
@@ -30,6 +31,7 @@ export class WebServiceService {
         private http: HttpClient,
         private accessInfo: AccessInfoService,
         private loader: LoadingBarService,
+        private snackbar: MatSnackBar,
 
     ) {
         this.loadingBarState = this.loader.useRef('router'); // Create a new LoadingBarState reference
@@ -59,7 +61,7 @@ export class WebServiceService {
                 break;
             case this.SCREEN_MODE_MINUS:
                 this.webServiceCnt -= 1;
-                if (this.webServiceCnt === 0) {
+                if (this.webServiceCnt <= 0) {
                     this.isWaiting = false;
                     this.loadingBarState.complete(); // Complete loading bar
                 }
@@ -122,7 +124,8 @@ export class WebServiceService {
                     this.handleError(error);
                 }
                 return of(false);
-            })
+            }),
+            finalize(() => this.fnWaitScreen(this.SCREEN_MODE_MINUS))
         );
     }
 
@@ -174,13 +177,17 @@ export class WebServiceService {
         if (response.fatalError.length > 0) {
             const errors = response.fatalError;
             for (let i = 0; i < errors.length; i++) {
-                if (errors[i].errId === 'MC000001' ||
-                    errors[i].errId === 'MC000002' ||
-                    errors[i].errId === 'MC000003') {
+                if (errors[i].errId === 'SYS_ERR_001' ||
+                    errors[i].errId === 'SYS_ERR_002' ||
+                    errors[i].errId === 'SYS_ERR_003') {
 
-                    if (isDevMode()) {
-                        // Logic for dev mode error handling
-                    }
+
+                    const navigationExtras: NavigationExtras = {
+                        state: {
+                            message: errors[i].errMsg
+                        }
+                    };
+                    this.router.navigate(['/error/error-500'], navigationExtras);
                     return false;
                 }
             }

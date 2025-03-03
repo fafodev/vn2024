@@ -9,10 +9,9 @@ export class AccessInfoService {
 
     private _username: string | null = null;
     private _token: string | null = null;
-    private _companyId: string | null = null;
+    private _customerId: string | null = null;
     private _language: string | "" = "";
     private _name: string | null = null;
-    private _dbName: string | "" = "";
 
     constructor(
         private readonly store: Store
@@ -40,12 +39,12 @@ export class AccessInfoService {
         this._token = value;
     }
 
-    get companyId(): string | null {
-        return this._companyId;
+    get customerId(): string | null {
+        return this._customerId;
     }
 
-    set companyId(value: string | null) {
-        this._companyId = value;
+    set customerId(value: string | null) {
+        this._customerId = value;
     }
 
     get language(): string | "" {
@@ -64,22 +63,13 @@ export class AccessInfoService {
         this._name = value;
     }
 
-    get dbName(): string | "" {
-        return this._dbName;
-    }
-
-    set dbName(value: string | "") {
-        this._dbName = value;
-    }
-
     getAll() {
         return {
             username: this._username,
             token: this._token,
-            companyId: this._companyId,
+            customerId: this._customerId,
             language: this._language,
             name: this._name,
-            dbName: this._dbName
         };
     }
 
@@ -87,9 +77,8 @@ export class AccessInfoService {
     clear() {
         this._username = null;
         this._token = null;
-        this._companyId = null;
+        this._customerId = null;
         this._language = "";
         this._name = null;
-        this._dbName = "";
     }
 }

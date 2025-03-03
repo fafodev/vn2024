@@ -94,11 +94,18 @@
                 <a [routerLink]="['/register']">{{defaultItemName[currentLanguage]['registerTitle2']}}</a>
             </p>
         </div>
+
+        <div>
+            <button mat-button (click)="showInfo()">Show Info</button>
+            <button mat-button (click)="showError()">Show Error</button>
+            <button mat-button (click)="showWarning()">Show Warning</button>
+            <button mat-button (click)="showConfirm()">Show Confirm</button>
+        </div>
     </div>
 
+
     <!-- CONFIGPANEL -->
-    <vex-config-panel-toggle
-    (openConfig)="configpanel.open()"></vex-config-panel-toggle>
+    <vex-config-panel-toggle (openConfig)="configpanel.open()"></vex-config-panel-toggle>
     <vex-sidebar #configpanel [invisibleBackdrop]="true" [opened]="!!(configPanelOpen$ | async)" position="right">
         <vex-config-panel></vex-config-panel>
     </vex-sidebar>
