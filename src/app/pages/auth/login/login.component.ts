@@ -31,6 +31,7 @@ import { AccessInfoService } from 'src/app/services/access-info.service';
 import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-progress-bar.component';
 import { AppFunctionService } from 'src/app/services/app-function.service';
 import { NotifyService } from 'src/app/services/notify.service';
+import { LanguageService } from 'src/app/services/language-service';
 
 @Component({
     selector: 'vex-login',
@@ -60,7 +61,7 @@ import { NotifyService } from 'src/app/services/notify.service';
 })
 export class LoginComponent {
     configPanelOpen$: Observable<boolean> = this.layoutService.configPanelOpen$;
-    currentLanguage$: Observable<string>;
+    currentLanguage$: Observable<string> | undefined;
 
     defaultItemName: IObjectString = defaultItemName;
     currentLanguage: string = "";
@@ -85,18 +86,18 @@ export class LoginComponent {
         private readonly webService: WebServiceService,
         private readonly accessInfo: AccessInfoService,
         private appFunctionService: AppFunctionService,
-        private notifyService: NotifyService
+        private notifyService: NotifyService,
+        private languageService: LanguageService
 
     ) {
-        this.currentLanguage$ = this.store.select(selectCurrentLanguage);
+        this.currentLanguage$ = this.languageService.currentLanguage$;
         this.currentLanguage$.subscribe(language => {
             this.currentLanguage = language;
         });
     }
 
     onLanguageMenuChange(language: string) {
-        this.currentLanguage = language;
-        this.store.dispatch(setLanguage({ language }));
+        this.languageService.setLanguage(language);
     }
 
     btnLoginClick() {
@@ -118,16 +119,17 @@ export class LoginComponent {
                         this.accessInfo.customerId = this.form.get('customerId')!.value;
                         this.accessInfo.language = this.currentLanguage;
                         this.accessInfo.name = response.name;
+                        localStorage.setItem('token', response.accessToken);
                         this.appFunctionService.reloadListFunction();
                     }
 
-                    this.router.navigate(['/dashboards']);
+                    this.router.navigate(['/dashboards/top']);
                 },
                 () => {
                     console.error('Error occurred');
                 }).subscribe();
         } else {
-            console.log(this.form.valid)
+            this.form.markAllAsTouched();
         }
 
     }

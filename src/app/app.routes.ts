@@ -49,6 +49,13 @@ export const appRoutes: VexRoutes = [
                     ).then((m) => m.TopComponent)
             },
             {
+                path: 'student-list',
+                loadComponent: () =>
+                    import(
+                        './pages/students/student-list/student-list.component'
+                    ).then((m) => m.StudentListComponent)
+            },
+            {
                 path: 'user-master',
                 loadComponent: () =>
                     import(

@@ -1,0 +1,120 @@
+<vex-secondary-toolbar current="THÔNG TIN HỌC SINH">
+    <vex-breadcrumbs [crumbs]="['Thông tin học sinh', 'Danh sách học sinh']" class="flex-auto"></vex-breadcrumbs>
+</vex-secondary-toolbar>
+
+<div [@stagger]="true" class="p-6 container-fluid">
+    <div class="flex flex-col sm:flex-row gap-4">
+        <div @fadeInUp class="card flex-auto">
+            <div class="px-6 py-4 border-b flex items-center">
+                <h2 class="title m-0">ĐIỀU KIỆN TÌM KIẾM</h2>
+            </div>
+
+            <div [formGroup]="studentForm" class="px-6 py-4 flex flex-col">
+                <div class="flex flex-col sm:flex-row sm:gap-4">
+                    <mat-form-field class="flex-auto">
+                        <mat-label>VP TUYỂN SINH</mat-label>
+                        <mat-select placeholder="Chọn văn phòng tuyển sinh" formControlName="admissionsOffice">
+                            <ng-container *ngFor="let item of listAdmissionsOffices">
+                                <mat-option [value]="item.OFFICE_ID">{{ item['OFFICE_NAME'] }}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto">
+                        <mat-label>VP ĐÀO TẠO</mat-label>
+                        <mat-select placeholder="Chọn văn phòng đào tạo" formControlName="trainingOffice">
+                            <ng-container *ngFor="let item of listTrainingOffices">
+                                <mat-option [value]="item.OFFICE_ID">{{ item['OFFICE_NAME'] }}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:gap-4">
+                    <mat-form-field class="flex-auto">
+                        <mat-label>KHU VỰC KTX</mat-label>
+                        <input matInput placeholder="Nhập khu vực KTX (nhập một phần)"
+                            formControlName="dormitoryArea" />
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto">
+                        <mat-label>TRƯỜNG TIẾNG</mat-label>
+                        <input matInput placeholder="Nhập tên trường tiếng (nhập một phần)"
+                            formControlName="languageSchool" />
+                    </mat-form-field>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:gap-4">
+                    <mat-form-field class="flex-auto">
+                        <mat-label>LỘ TRÌNH BAY</mat-label>
+                        <mat-select placeholder="Chọn lộ trình bay" formControlName="flightRoute">
+                            <ng-container *ngFor="let item of listFlights">
+                                <mat-option [value]="item.FLIGHT_ID">{{ item['FLIGHT_ROUTE'] }}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto">
+                        <mat-label>ĐOÀN NHẬP CẢNH</mat-label>
+                        <input matInput placeholder="Nhập tên đoàn nhập cảnh (nhập một phần)"
+                            formControlName="entryGroup" />
+                    </mat-form-field>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:gap-4">
+                    <mat-form-field class="flex-auto">
+                        <mat-label>NGÀY XUẤT CẢNH</mat-label>
+                        <input matInput [matDatepicker]="formDatepickerRef" placeholder="Nhập ngày xuất cảnh"
+                            formControlName="departureDate" />
+                        <mat-datepicker-toggle [for]="formDatepickerRef" matIconSuffix></mat-datepicker-toggle>
+                        <mat-datepicker #formDatepickerRef></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field class="flex-auto">
+                        <mat-label>NGÀY NHẬP CẢNH</mat-label>
+                        <input matInput [matDatepicker]="formDatepickerRef1" placeholder="Nhập ngày nhập cảnh"
+                            formControlName="entryDate" />
+                        <mat-datepicker-toggle [for]="formDatepickerRef1" matIconSuffix></mat-datepicker-toggle>
+                        <mat-datepicker #formDatepickerRef1></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:gap-4">
+                    <mat-form-field class="flex-auto">
+                        <mat-label>ĐĂNG KÝ NƠI Ở</mat-label>
+                        <mat-select placeholder="Chọn nơi ở đã đăng ký" formControlName="registeredDormitory">
+                            <ng-container *ngFor="let item of listDormitories">
+                                <mat-option [value]="item.DORMITORY_ID">{{ item['DORMITORY_NAME'] }}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto">
+                        <mat-label>ĐĂNG KÝ DỊCH VỤ</mat-label>
+                        <mat-select placeholder="Chọn dịch vụ đã đăng ký" formControlName="registeredService">
+                            <ng-container *ngFor="let item of listServices">
+                                <mat-option [value]="item.SERVICE_ID">{{ item['SERVICE_NAME'] }}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:gap-4">
+                    <mat-form-field class="flex-auto">
+                        <mat-label>MÃ HỌC SINH</mat-label>
+                        <input matInput placeholder="Nhập mã học sinh" formControlName="studentId" />
+                    </mat-form-field>
+
+                    <mat-form-field class="flex-auto">
+                        <mat-label>HỌ VÀ TÊN HỌC SINH</mat-label>
+                        <input matInput placeholder="Nhập tên học sinh" formControlName="studentName" />
+                    </mat-form-field>
+                </div>
+
+                <div class="flex items-center justify-end gap-2">
+                    <button mat-button type="button" (click)="resetForm()">XÓA</button>
+                    <button color="primary" mat-flat-button type="button">TÌM KIẾM</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -8,7 +8,7 @@ import { selectCurrentLanguage } from '../state/language/language.selectors';
 export class AccessInfoService {
 
     private _username: string | null = null;
-    private _token: string | null = null;
+    private _token: string | null = "";
     private _customerId: string | null = null;
     private _language: string | "" = "";
     private _name: string | null = null;

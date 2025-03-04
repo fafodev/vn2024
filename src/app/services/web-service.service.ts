@@ -6,10 +6,9 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import * as Const from '../app.const'
 import { AccessInfoService } from './access-info.service';
-import { IObjectString } from '../app.interface';
 import { LoadingBarService } from '@ngx-loading-bar/core';
 import { LoadingBarState } from '@ngx-loading-bar/core/loading-bar.state';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
     providedIn: 'root'

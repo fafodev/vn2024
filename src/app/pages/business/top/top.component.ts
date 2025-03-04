@@ -5,7 +5,7 @@ import {
     ViewChild,
     ViewEncapsulation
 } from '@angular/core';
-import { Subject } from 'rxjs';
+import { catchError, map, Observable, of, Subject } from 'rxjs';
 import {
     CalendarA11y,
     CalendarCommonModule,
@@ -41,6 +41,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { NavigationLoaderService } from 'src/app/core/navigation/navigation-loader.service';
+import { WebServiceService } from 'src/app/services/web-service.service';
+import { AccessInfoService } from 'src/app/services/access-info.service';
 
 const colors: any = {
     blue: {
@@ -159,11 +161,24 @@ export class TopComponent implements OnInit {
         private dialog: MatDialog,
         private snackbar: MatSnackBar,
         private navigationLoaderService: NavigationLoaderService,
+        private accessInfo: AccessInfoService,
+        private webService: WebServiceService
     ) {
-        
+
     }
     ngOnInit(): void {
+        this.test().subscribe();;
+    }
 
+    test(): Observable<any[]> {
+        let request = {
+            accessInfo: this.accessInfo.getAll()
+        };
+
+        return this.webService.callWs('student-init', request).pipe(
+            map(response => response.listFlights),
+            catchError(() => of([]))
+        );
     }
 
     dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
