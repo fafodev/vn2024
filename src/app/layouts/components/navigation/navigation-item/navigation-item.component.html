@@ -2,7 +2,7 @@
     'bg-primary-600 text-on-primary-600': (isActive$ | async)?.(item),
     'navigation-color': !(isActive$ | async)?.(item)
   }" [routerLink]="item.route" class="navigation-item" matRipple>
-  <span class="navigation-item-text" [ngClass]="{
+    <span class="navigation-item-text" [ngClass]="{
     'active': (isActive$ | async)?.(item)
   }">{{ item.label }}</span>
 </a>
