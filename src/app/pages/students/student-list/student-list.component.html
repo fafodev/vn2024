@@ -64,17 +64,25 @@
                 <div class="flex flex-col sm:flex-row sm:gap-4">
                     <mat-form-field class="flex-auto">
                         <mat-label>NGÀY XUẤT CẢNH</mat-label>
-                        <input matInput [matDatepicker]="formDatepickerRef" placeholder="Nhập ngày xuất cảnh"
-                            formControlName="departureDate" />
-                        <mat-datepicker-toggle [for]="formDatepickerRef" matIconSuffix></mat-datepicker-toggle>
-                        <mat-datepicker #formDatepickerRef></mat-datepicker>
+                        <input matInput [matDatepicker]="departureDate" placeholder="Nhập ngày xuất cảnh"
+                            formControlName="departureDate" appDateInput />
+                        <mat-datepicker-toggle [for]="departureDate" matIconSuffix></mat-datepicker-toggle>
+                        <mat-datepicker #departureDate></mat-datepicker>
+                        <mat-error *ngIf="studentForm.get('departureDate')?.hasError('invalidDate')">
+                            Định dạng ngày không hợp lệ. Định dạng đúng là
+                            {{ currentLanguage === 'JP' ? 'YYYY/MM/DD' : 'DD/MM/YYYY' }}.
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field class="flex-auto">
                         <mat-label>NGÀY NHẬP CẢNH</mat-label>
                         <input matInput [matDatepicker]="formDatepickerRef1" placeholder="Nhập ngày nhập cảnh"
-                            formControlName="entryDate" />
+                            formControlName="entryDate" appDateInput />
                         <mat-datepicker-toggle [for]="formDatepickerRef1" matIconSuffix></mat-datepicker-toggle>
                         <mat-datepicker #formDatepickerRef1></mat-datepicker>
+                        <mat-error *ngIf="studentForm.get('entryDate')?.hasError('invalidDate')">
+                            Định dạng ngày không hợp lệ. Định dạng đúng là
+                            {{ currentLanguage === 'JP' ? 'YYYY/MM/DD' : 'DD/MM/YYYY' }}.
+                        </mat-error>
                     </mat-form-field>
                 </div>
 
@@ -112,7 +120,7 @@
 
                 <div class="flex items-center justify-end gap-2">
                     <button mat-button type="button" (click)="resetForm()">XÓA</button>
-                    <button color="primary" mat-flat-button type="button">TÌM KIẾM</button>
+                    <button color="primary" mat-flat-button type="button" (click)="search()">TÌM KIẾM</button>
                 </div>
             </div>
         </div>

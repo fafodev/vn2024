@@ -9,7 +9,7 @@ import { selectCurrentLanguage } from '../state/language/language.selectors';
     providedIn: 'root'
 })
 export class LanguageService {
-    private currentLanguageSubject = new BehaviorSubject<string>('en');
+    private currentLanguageSubject = new BehaviorSubject<string>('EN');
     currentLanguage$ = this.currentLanguageSubject.asObservable();
 
     constructor(private dateAdapter: DateAdapter<any>, private store: Store) {
@@ -28,5 +28,9 @@ export class LanguageService {
         this.currentLanguageSubject.next(language);
         this.store.dispatch(setLanguage({ language }));
         localStorage.setItem('language', language);
+    }
+
+    getLanguage(): string {
+        return this.currentLanguageSubject.value;
     }
 }

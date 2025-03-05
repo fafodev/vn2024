@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { MatOptionModule } from '@angular/material/core';
+import { AsyncPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,34 +9,33 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { WebServiceService } from 'src/app/services/web-service.service';
 import { AccessInfoService } from 'src/app/services/access-info.service';
 import { AppFunctionService } from 'src/app/services/app-function.service';
 import { NotifyService } from 'src/app/services/notify.service';
-import { setLanguage } from 'src/app/state/language/language.actions';
-import { selectCurrentLanguage } from 'src/app/state/language/language.selectors';
 import { stagger60ms } from '@vex/animations/stagger.animation';
 import { fadeInUp400ms } from '@vex/animations/fade-in-up.animation';
 import { VexSecondaryToolbarComponent } from '@vex/components/vex-secondary-toolbar/vex-secondary-toolbar.component';
 import { VexBreadcrumbsComponent } from '@vex/components/vex-breadcrumbs/vex-breadcrumbs.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
-import { inject } from '@angular/core';
 import { LanguageService } from 'src/app/services/language-service';
+import { dateValidator, getDateRequest } from 'src/app/custom-date-adapter';
+import { DateInputDirective } from 'src/app/date-input.directive';
 
 @Component({
     selector: 'vex-student-list',
     standalone: true,
-    imports: [FormsModule, ReactiveFormsModule, AsyncPipe, NgFor, NgIf, MatOptionModule, MatSelectModule, MatInputModule, MatFormFieldModule, MatIconModule, MatButtonModule, MatDatepickerModule, VexSecondaryToolbarComponent, VexBreadcrumbsComponent],
+    imports: [FormsModule, ReactiveFormsModule, NgFor, NgIf, MatOptionModule, MatSelectModule,
+        MatInputModule, MatFormFieldModule, MatIconModule, MatButtonModule, MatDatepickerModule,
+        VexSecondaryToolbarComponent, VexBreadcrumbsComponent, DateInputDirective],
     templateUrl: './student-list.component.html',
     styleUrl: './student-list.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [stagger60ms, fadeInUp400ms],
 })
 export class StudentListComponent implements OnInit {
-    private dateAdapter = inject(DateAdapter<any>);
     currentLanguage$: Observable<string> | undefined;
     currentLanguage: string = "";
     listFlights: any[] = [];
@@ -56,7 +55,7 @@ export class StudentListComponent implements OnInit {
         private readonly accessInfo: AccessInfoService,
         private appFunctionService: AppFunctionService,
         private notifyService: NotifyService,
-        private languageService: LanguageService
+        private languageService: LanguageService,
     ) {
         // Kiểm tra localStorage để set ngôn ngữ mặc định
         this.currentLanguage$ = this.languageService.currentLanguage$;
@@ -71,8 +70,8 @@ export class StudentListComponent implements OnInit {
             languageSchool: [''],
             flightRoute: [''],
             entryGroup: [''],
-            departureDate: [''],
-            entryDate: [''],
+            departureDate: [null, [dateValidator]],
+            entryDate: [null, [dateValidator]],
             registeredDormitory: [''],
             registeredService: [''],
             studentId: [''],
@@ -114,7 +113,33 @@ export class StudentListComponent implements OnInit {
             }).subscribe();
     }
 
+    search() {
+        // Lấy dữ liệu từ form
+        let formData = { ...this.studentForm.value };
 
+        // Chuyển đổi ngày thành định dạng YYYY-MM-DD
+        if (formData.departureDate) {
+            formData.departureDate = getDateRequest(formData.departureDate);
+        }
+        if (formData.entryDate) {
+            formData.entryDate = getDateRequest(formData.departureDate);
+        }
+
+        // Tạo request với accessInfo và dữ liệu đã chuyển đổi
+        let request = {
+            accessInfo: this.accessInfo.getAll(),
+            searchData: formData
+        };
+
+        this.webService.callWs('student-search', request,
+            (response) => {
+                if (response) {
+                    console.log('Search Result:', response);
+                    // Xử lý kết quả tìm kiếm nếu cần
+                }
+            },
+            () => { }).subscribe();
+    }
 
     resetForm(): void {
         this.studentForm.reset({
@@ -124,8 +149,8 @@ export class StudentListComponent implements OnInit {
             languageSchool: '',
             flightRoute: '',
             entryGroup: '',
-            departureDate: '',
-            entryDate: '',
+            departureDate: null,
+            entryDate: null,
             registeredDormitory: '',
             registeredService: '',
             studentId: '',
