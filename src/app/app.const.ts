@@ -17,3 +17,6 @@ export function serverHost(): string {
 export const projectName = 'vijp';
 
 export type Language = 'EN' | 'JP' | 'VI';
+
+export const pageSizeOptions = [20, 50, 100];
+export const pageSize = 20;
