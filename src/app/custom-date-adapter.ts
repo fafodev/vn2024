@@ -42,18 +42,6 @@ export class CustomDateAdapter extends MomentDateAdapter {
     }
 }
 
-export function dateValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return { invalidDate: true }; // Cho phép bỏ trống
-
-    const value = control.value;
-
-    // Nếu không phải Moment hoặc không phải ngày hợp lệ
-    if (!moment.isMoment(value) || !value.isValid()) {
-        return { invalidDate: true };
-    }
-
-    return null;
-}
 /**
  * Chuyển đổi ngày về định dạng YYYY-MM-DD để gửi request
  * @param date - Giá trị ngày cần chuyển đổi

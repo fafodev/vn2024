@@ -140,7 +140,7 @@
             </h2>
 
             <div *ngIf="selection.hasValue()" class="mr-4 pr-4 border-r flex-none">
-                <button (click)="deleteCustomers(selection.selected)" color="primary" mat-icon-button
+                <button (click)="deleteStudents(selection.selected)" color="primary" mat-icon-button
                     matTooltip="Delete selected" type="button">
                     <mat-icon svgIcon="mat:delete"></mat-icon>
                 </button>
@@ -162,7 +162,7 @@
                 <mat-icon svgIcon="mat:filter_list"></mat-icon>
             </button>
 
-            <button (click)="createCustomer()" class="ml-4 flex-none" color="primary" mat-mini-fab
+            <button (click)="createStudent()" class="ml-4 flex-none" color="primary" mat-mini-fab
                 matTooltip="Add Customer" type="button">
                 <mat-icon svgIcon="mat:add"></mat-icon>
             </button>
@@ -234,22 +234,32 @@
             </ng-container>
 
             <!-- Label Column -->
-            <ng-container matColumnDef="labels">
-                <th *matHeaderCellDef class="uppercase" mat-header-cell mat-sort-header>
-                    Labels
-                </th>
-                <td *matCellDef="let row" mat-cell>
-                    <div (click)="$event.stopPropagation()" class="flex items-center gap-1">
-                        <div *ngFor="let label of row.labels" [ngClass]="[label.textClass, label.bgClass]"
-                            class="rounded px-2 py-1 font-medium text-xs flex-none">
-                            {{ label.text }}
+            <ng-container *ngFor="let column of columns">
+                <ng-container *ngIf="column.type === 'labels'" [matColumnDef]="column.property">
+                    <th *matHeaderCellDef class="uppercase" mat-header-cell mat-sort-header>
+                        {{ column.label }}
+                    </th>
+                    <td *matCellDef="let row" mat-cell>
+                        <div (click)="$event.stopPropagation()" class="flex items-center gap-1">
+                            <div *ngFor="let label of row[column.property].split(',').slice(0, 2)">
+                                <ng-container *ngIf="label">
+                                    <div [ngClass]="label.split('|')[1] + ' ' + label.split('|')[2]"
+                                        class="rounded px-2 py-1 font-medium text-xs flex-none">
+                                        {{ label.split('|')[0] }}
+                                    </div>
+                                </ng-container>
+                            </div>
+
+                            <div *ngIf="row[column.property].split(',').length > 2"
+                                class="bg-base text-hint cursor-pointer hover:bg-hover flex-none flex items-center justify-center"
+                                [matMenuTriggerData]="{ services: row[column.property], property: column.property}"
+                                [matMenuTriggerFor]="listServicesMenu">
+                                <mat-icon class="icon-sm" svgIcon="mat:more_horiz"></mat-icon>
+                            </div>
+
                         </div>
-                        <div
-                            class="bg-base text-hint cursor-pointer hover:bg-hover flex-none flex items-center justify-center">
-                            <mat-icon class="icon-sm" svgIcon="mat:add"></mat-icon>
-                        </div>
-                    </div>
-                </td>
+                    </td>
+                </ng-container>
             </ng-container>
 
             <!-- Action Column -->
@@ -264,7 +274,7 @@
             </ng-container>
 
             <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
-            <tr (click)="updateCustomer(row)" *matRowDef="let row; columns: visibleColumns" @fadeInUp
+            <tr (click)="updateStudent(row)" *matRowDef="let row; columns: visibleColumns" @fadeInUp
                 class="hover:bg-hover transition duration-400 ease-out-swift cursor-pointer" mat-row></tr>
         </table>
         <mat-paginator class="sticky left-0" #paginator class="demo-paginator" (page)="handlePageEvent($event)"
@@ -282,13 +292,26 @@
     </button>
 </mat-menu>
 
+<mat-menu #listServicesMenu="matMenu" xPosition="before" yPosition="below">
+    <ng-template let-services="services" let-property="property" matMenuContent>
+        <div *ngFor="let label of services.split(',')">
+            <ng-container *ngIf="label">
+                <div [ngClass]="label.split('|')[1] + ' ' + label.split('|')[2]"
+                    class="rounded px-2 py-1 font-medium text-xs flex-none mb-1">
+                    {{ label.split('|')[0] }}
+                </div>
+            </ng-container>
+        </div>
+    </ng-template>
+</mat-menu>
+
 <mat-menu #actionsMenu="matMenu" xPosition="before" yPosition="below">
     <ng-template let-customer="customer" matMenuContent>
-        <button (click)="updateCustomer(customer)" mat-menu-item>
+        <button (click)="updateStudent(customer)" mat-menu-item>
             <mat-icon svgIcon="mat:edit"></mat-icon>
             <span>Modify</span>
         </button>
-        <button (click)="deleteCustomer(customer)" mat-menu-item>
+        <button (click)="deleteStudent(customer)" mat-menu-item>
             <mat-icon svgIcon="mat:delete"></mat-icon>
             <span>Delete</span>
         </button>
