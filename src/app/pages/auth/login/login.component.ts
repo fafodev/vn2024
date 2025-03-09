@@ -32,6 +32,7 @@ import { VexProgressBarComponent } from '@vex/components/vex-progress-bar/vex-pr
 import { AppFunctionService } from 'src/app/services/app-function.service';
 import { NotifyService } from 'src/app/services/notify.service';
 import { LanguageService } from 'src/app/services/language-service';
+import { MessageService } from 'src/app/services/messages.service';
 
 @Component({
     selector: 'vex-login',
@@ -87,7 +88,8 @@ export class LoginComponent {
         private readonly accessInfo: AccessInfoService,
         private appFunctionService: AppFunctionService,
         private notifyService: NotifyService,
-        private languageService: LanguageService
+        private languageService: LanguageService,
+        private messageService: MessageService
 
     ) {
         this.currentLanguage$ = this.languageService.currentLanguage$;
@@ -121,6 +123,8 @@ export class LoginComponent {
                         this.accessInfo.name = response.name;
                         localStorage.setItem('token', response.accessToken);
                         this.appFunctionService.reloadListFunction();
+
+                        this.messageService.loadMessages(response.messages);
                     }
 
                     this.router.navigate(['/dashboards/top']);

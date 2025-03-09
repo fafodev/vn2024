@@ -19,6 +19,7 @@ export class WebServiceService {
     private readonly FILE_TYPE_CSV = 'CSV';
     private readonly FILE_TYPE_PDF = 'PDF';
     private readonly FILE_TYPE_ZIP = 'ZIP';
+    private readonly FILE_TYPE_EXCEL = 'EXCEL';
 
     private webServiceCnt = 0;
     private isWaiting = false;
@@ -84,7 +85,7 @@ export class WebServiceService {
         return null;  // Nếu có lỗi, trả về null hoặc một đối tượng lỗi cụ thể
     }
 
-    callWs(serviceName: string, data: any, fncSuccess?: (data: any) => void, fncError?: () => void): Observable<any> {
+    callWs(serviceName: string, data: any, fncSuccess?: (data: any) => void, fncError?: (error: any) => void): Observable<any> {
         this.fnWaitScreen(this.SCREEN_MODE_PLUS);
 
         const url = `${Const.serverHost()}/${Const.projectName}/${Const.service}${serviceName}`;
@@ -97,7 +98,7 @@ export class WebServiceService {
             map(response => this.handleResponse(response, fncSuccess)),  // Trả về dữ liệu thực tế
             catchError(error => {
                 if (fncError) {
-                    fncError();
+                    fncError(error);
                 } else {
                     this.handleError(error);
                 }
@@ -132,10 +133,28 @@ export class WebServiceService {
         this.fnWaitScreen(this.SCREEN_MODE_PLUS);
 
         const url = `${Const.service}${webServiceNm}${param}`;
+
         switch (fileType) {
             case this.FILE_TYPE_CSV:
             case this.FILE_TYPE_ZIP:
-                window.location.href = url;
+            case this.FILE_TYPE_EXCEL:
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = fileType === this.FILE_TYPE_CSV ? 'download.csv' :
+                            fileType === this.FILE_TYPE_ZIP ? 'download.zip' : 'download.xlsx';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    })
+                    .catch(error => console.error('Error downloading file:', error));
                 break;
             case this.FILE_TYPE_PDF:
                 window.open(url);
@@ -170,6 +189,70 @@ export class WebServiceService {
             }),
             finalize(() => this.fnWaitScreen(this.SCREEN_MODE_MINUS))
         );
+    }
+
+    callDownloadWs(serviceName: string, data: any, fncSuccess?: (data: any) => void, fncError?: (error: any) => void): Observable<any> {
+        this.fnWaitScreen(this.SCREEN_MODE_PLUS);
+
+        const url = `${Const.serverHost()}/${Const.projectName}/${Const.service}${serviceName}`;
+        return this.http.post(url, data, {
+            headers: new HttpHeaders({
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=utf-8'
+            }),
+            responseType: 'blob', // 🟢 Nhận dữ liệu dạng binary (file)
+            observe: 'response'   // 🟢 Lấy cả response header
+        }).pipe(
+            map(response => {
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let fileName = this.extractFileName(contentDisposition) || 'download.xlsx'; // Lấy tên file từ header
+                if (!fileName.endsWith('.xlsx')) {
+                    fileName += '.xlsx';
+                }
+                this.downloadFile(response.body as Blob, fileName);
+                if (fncSuccess) fncSuccess(response.body);
+                return response.body;
+            }),
+            catchError(error => {
+                if (fncError) {
+                    fncError(error);
+                } else {
+                    this.handleError(error);
+                }
+                return of(null);
+            }),
+            finalize(() => this.fnWaitScreen(this.SCREEN_MODE_MINUS))
+        );
+    }
+
+    private extractFileName(contentDisposition: string | null): string | null {
+        if (!contentDisposition) return null;
+
+        // 🟢 Kiểm tra "filename*=" (UTF-8 format)
+        let matches = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)/);
+        if (!matches) {
+            // 🟢 Nếu không có "filename*=", kiểm tra "filename="
+            matches = contentDisposition.match(/filename="([^"]+)"/);
+        }
+
+        if (matches && matches[1]) {
+            return decodeURIComponent(matches[1].trim()); // 🟢 Giải mã tên file (nếu có ký tự đặc biệt)
+        }
+
+        return null;
+    }
+
+    private downloadFile(blob: Blob, fileName: string): void {
+        const link = document.createElement('a');
+        const url = window.URL.createObjectURL(blob);
+
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
     }
 
     private fnCheckCommonError(response: any): boolean {

@@ -20,3 +20,6 @@ export type Language = 'EN' | 'JP' | 'VI';
 
 export const pageSizeOptions = [20, 50, 100];
 export const pageSize = 20;
+
+export const MODE_UPD = 'update';
+export const MODE_INS = 'create';

@@ -31,10 +31,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { TableColumn } from '@vex/interfaces/table-column.interface';
 import { MatDialog } from '@angular/material/dialog';
-import { NotifyModalComponent } from 'src/app/layouts/components/notify-modal/notify-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { pageSize, pageSizeOptions } from 'src/app/app.const';
+import { StudentRegistUpdateComponent } from '../student-regist/student-regist-update.component';
+import { MessageService } from 'src/app/services/messages.service';
 
 @Component({
     selector: 'vex-student-list',
@@ -74,9 +75,9 @@ export class StudentListComponent implements OnInit, AfterViewInit {
         private store: Store,
         private readonly webService: WebServiceService,
         private readonly accessInfo: AccessInfoService,
-        private appFunctionService: AppFunctionService,
         private notifyService: NotifyService,
         private languageService: LanguageService,
+        private messageService: MessageService,
         private dialog: MatDialog
     ) {
         // Kiểm tra localStorage để set ngôn ngữ mặc định
@@ -95,7 +96,7 @@ export class StudentListComponent implements OnInit, AfterViewInit {
             departureDate: [null],
             entryDate: [null],
             registeredDormitory: [''],
-            registeredService: [''],
+            registeredService: [[]],
             studentId: [''],
             studentName: ['']
         });
@@ -149,7 +150,7 @@ export class StudentListComponent implements OnInit, AfterViewInit {
             departureDate: null,
             entryDate: null,
             registeredDormitory: '',
-            registeredService: '',
+            registeredService: [],
             studentId: '',
             studentName: ''
         });
@@ -180,11 +181,13 @@ export class StudentListComponent implements OnInit, AfterViewInit {
     }
 
     search() {
-        console.log(this.studentForm);
         if (this.studentForm.invalid) {
             this.studentForm.markAllAsTouched();
             return;
         }
+
+        // Reset dữ liệu trước khi search
+        this.subject$.next([]);
 
         // Lấy dữ liệu từ form
         let formData = { ...this.studentForm.value };
@@ -216,7 +219,7 @@ export class StudentListComponent implements OnInit, AfterViewInit {
                         this.listStudents = response.listStudents;
                         this.subject$.next(this.listStudents);
                     } else {
-                        this.notifyService.info('No data found', null);
+                        this.notifyService.error(response.fatalError[0]?.errMsg, null);
                     }
                 }
             },
@@ -249,9 +252,18 @@ export class StudentListComponent implements OnInit, AfterViewInit {
         }
     }
 
+    downloadExcel() {
+        this.executeDownloadXls([]);
+    }
+
+    uploadCsv() { }
+
     createStudent() {
         this.dialog
-            .open(NotifyModalComponent)
+            .open(StudentRegistUpdateComponent, {
+                disableClose: true, // Prevent closing the modal when clicking outside
+                width: '80%'
+            })
             .afterClosed()
             .subscribe((student: any) => {
                 /**
@@ -268,16 +280,19 @@ export class StudentListComponent implements OnInit, AfterViewInit {
             });
     }
 
-    updateStudent(customer: any) {
+    updateStudent(student: any) {
         this.dialog
-            .open(NotifyModalComponent, {
-                data: customer
+            .open(StudentRegistUpdateComponent, {
+                data: student,
+                disableClose: true, // Prevent closing the modal when clicking outside
+                width: '80%'
             })
             .afterClosed()
             .subscribe((updatedStudent) => {
                 /**
                  * Student is the updated customer (if the user pressed Save - otherwise it's null)
                  */
+                console.log('updatedStudent:', updatedStudent);
                 if (updatedStudent) {
                     /**
                      * Here we are updating our local array.
@@ -292,27 +307,60 @@ export class StudentListComponent implements OnInit, AfterViewInit {
             });
     }
 
-    deleteStudent(customer: any) {
-        /**
-         * Here we are updating our local array.
-         * You would probably make an HTTP request here.
-         */
-        this.listStudents.splice(
-            this.listStudents.findIndex(
-                (existingStudent) => existingStudent.id === customer.id
-            ),
-            1
-        );
-        this.selection.deselect(customer);
-        this.subject$.next(this.listStudents);
+    deleteStudent(student: any) {
+        this.executeDeleteStudent([...student]);
     }
 
     deleteStudents(listStudents: any[]) {
-        /**
-         * Here we are updating our local array.
-         * You would probably make an HTTP request here.
-         */
-        listStudents.forEach((c) => this.deleteStudent(c));
+        this.executeDeleteStudent(listStudents);
+    }
+
+    executeDeleteStudent(listStudents: any[]) {
+        // Tạo request với accessInfo và dữ liệu đã chuyển đổi
+        let request = {
+            accessInfo: this.accessInfo.getAll(),
+            listStudents: listStudents
+        };
+
+        this.webService.callWs('student-delete', request,
+            (response) => {
+                if (response && response.delCnt > 0) {
+                    this.notifyService.info('Delete successfully', null);
+                    this.selection.clear();
+                    this.search();
+                }
+            },
+            () => { }).subscribe();
+    }
+
+    downloadXls(listStudents: any[]) {
+        this.executeDownloadXls([...listStudents]);
+    }
+
+    executeDownloadXls(listStudents: any[]) {
+        // Lấy dữ liệu từ form
+        let formData = { ...this.studentForm.value };
+
+        // Chuyển đổi ngày thành định dạng YYYY-MM-DD
+        if (formData.departureDate) {
+            formData.departureDate = getDateRequest(formData.departureDate);
+        }
+        if (formData.entryDate) {
+            formData.entryDate = getDateRequest(formData.entryDate);
+        }
+
+        // Tạo request với accessInfo và dữ liệu đã chuyển đổi
+        let request = {
+            accessInfo: this.accessInfo.getAll(),
+            listStudents: listStudents,
+            ...formData,
+        };
+
+        this.webService.callDownloadWs('student-export-xlsx', request,
+            (response) => {
+                this.notifyService.info(this.messageService.getMessage("NOR_INF_004"), null);
+            },
+            (error) => { console.log(error) }).subscribe();
     }
 
     onFilterChange(value: string) {
@@ -364,6 +412,11 @@ export class StudentListComponent implements OnInit, AfterViewInit {
         },
         { label: 'Actions', property: 'actions', type: 'button', visible: true },
         {
+            label: 'ID',
+            property: 'STUDENT_ID',
+            type: 'text',
+            visible: true
+        }, {
             label: 'Name',
             property: 'FULL_NAME',
             type: 'text',

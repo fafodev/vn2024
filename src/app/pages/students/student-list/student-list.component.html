@@ -15,6 +15,7 @@
                     <mat-form-field class="flex-auto">
                         <mat-label>VP TUYỂN SINH</mat-label>
                         <mat-select placeholder="Chọn văn phòng tuyển sinh" formControlName="admissionsOffice">
+                            <mat-option [value]="">---</mat-option>
                             <ng-container *ngFor="let item of listAdmissionsOffices">
                                 <mat-option [value]="item.OFFICE_ID">{{ item['OFFICE_NAME'] }}</mat-option>
                             </ng-container>
@@ -24,6 +25,7 @@
                     <mat-form-field class="flex-auto">
                         <mat-label>VP ĐÀO TẠO</mat-label>
                         <mat-select placeholder="Chọn văn phòng đào tạo" formControlName="trainingOffice">
+                            <mat-option [value]="">---</mat-option>
                             <ng-container *ngFor="let item of listTrainingOffices">
                                 <mat-option [value]="item.OFFICE_ID">{{ item['OFFICE_NAME'] }}</mat-option>
                             </ng-container>
@@ -40,8 +42,12 @@
 
                     <mat-form-field class="flex-auto">
                         <mat-label>TRƯỜNG TIẾNG</mat-label>
-                        <input matInput placeholder="Nhập tên trường tiếng (nhập một phần)"
-                            formControlName="languageSchool" />
+                        <mat-select placeholder="Chọn trường tiếng" formControlName="languageSchool">
+                            <mat-option [value]="">---</mat-option>
+                            <ng-container *ngFor="let item of listSchools">
+                                <mat-option [value]="item.SCHOOL_ID">{{ item['SCHOOL_NAME'] }}</mat-option>
+                            </ng-container>
+                        </mat-select>
                     </mat-form-field>
                 </div>
 
@@ -49,6 +55,7 @@
                     <mat-form-field class="flex-auto">
                         <mat-label>LỘ TRÌNH BAY</mat-label>
                         <mat-select placeholder="Chọn lộ trình bay" formControlName="flightRoute">
+                            <mat-option [value]="">---</mat-option>
                             <ng-container *ngFor="let item of listFlights">
                                 <mat-option [value]="item.FLIGHT_ID">{{ item['FLIGHT_ROUTE'] }}</mat-option>
                             </ng-container>
@@ -91,6 +98,7 @@
                     <mat-form-field class="flex-auto">
                         <mat-label>ĐĂNG KÝ NƠI Ở</mat-label>
                         <mat-select placeholder="Chọn nơi ở đã đăng ký" formControlName="registeredDormitory">
+                            <mat-option [value]="">---</mat-option>
                             <ng-container *ngFor="let item of listDormitories">
                                 <mat-option [value]="item.DORMITORY_ID">{{ item['DORMITORY_NAME'] }}</mat-option>
                             </ng-container>
@@ -99,7 +107,8 @@
 
                     <mat-form-field class="flex-auto">
                         <mat-label>ĐĂNG KÝ DỊCH VỤ</mat-label>
-                        <mat-select placeholder="Chọn dịch vụ đã đăng ký" formControlName="registeredService">
+                        <mat-select multiple placeholder="Chọn dịch vụ đã đăng ký" formControlName="registeredService">
+                            <mat-option [value]="">---</mat-option>
                             <ng-container *ngFor="let item of listServices">
                                 <mat-option [value]="item.SERVICE_ID">{{ item['SERVICE_NAME'] }}</mat-option>
                             </ng-container>
@@ -145,8 +154,9 @@
                     <mat-icon svgIcon="mat:delete"></mat-icon>
                 </button>
 
-                <button color="primary" mat-icon-button matTooltip="Another action" type="button">
-                    <mat-icon svgIcon="mat:folder"></mat-icon>
+                <button (click)="downloadXls(selection.selected)" color="primary" mat-icon-button
+                    matTooltip="Download excel" type="button">
+                    <mat-icon svgIcon="mat:cloud_download"></mat-icon>
                 </button>
             </div>
 
@@ -241,7 +251,7 @@
                     </th>
                     <td *matCellDef="let row" mat-cell>
                         <div (click)="$event.stopPropagation()" class="flex items-center gap-1">
-                            <div *ngFor="let label of row[column.property].split(',').slice(0, 2)">
+                            <div *ngFor="let label of row[column.property]?.split(',').slice(0, 2)">
                                 <ng-container *ngIf="label">
                                     <div [ngClass]="label.split('|')[1] + ' ' + label.split('|')[2]"
                                         class="rounded px-2 py-1 font-medium text-xs flex-none">
@@ -250,7 +260,7 @@
                                 </ng-container>
                             </div>
 
-                            <div *ngIf="row[column.property].split(',').length > 2"
+                            <div *ngIf="row[column.property]?.split(',').length > 2"
                                 class="bg-base text-hint cursor-pointer hover:bg-hover flex-none flex items-center justify-center"
                                 [matMenuTriggerData]="{ services: row[column.property], property: column.property}"
                                 [matMenuTriggerFor]="listServicesMenu">
@@ -281,6 +291,14 @@
             [length]="recordsTotal" [pageSize]="pageSize" [showFirstLastButtons]="true"
             [pageSizeOptions]="pageSizeOptions" [hidePageSize]="false" [pageIndex]="pageIndex" aria-label="Select page">
         </mat-paginator>
+        <div class="px-6 py-4 flex flex-col" *ngIf="listStudents && listStudents.length > 0">
+            <div class="flex justify-end gap-2">
+                <button color="primary" mat-flat-button type="button" (click)="createStudent()">Thêm</button>
+                <button color="primary" mat-flat-button type="button" (click)="downloadExcel()">Download</button>
+                <button color="primary" mat-flat-button type="button" (click)="uploadCsv()">Đăng ký hàng loạt</button>
+            </div>
+        </div>
+
     </div>
 </div>
 

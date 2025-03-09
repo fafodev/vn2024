@@ -52,3 +52,14 @@ export function getDateRequest(date: any): string | null {
     const momentDate = moment(date, ['YYYY/MM/DD', 'DD/MM/YYYY'], true);
     return momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null;
 }
+
+/**
+ * Chuyển đổi ngày từ định dạng YYYY-MM-DD về định dạng đúng để set vào datepicker
+ * @param date - Giá trị ngày cần chuyển đổi
+ * @returns moment.Moment | null
+ */
+export function getDateForDatepicker(date: string): moment.Moment | null {
+    if (!date) return null;
+    const momentDate = moment(date, 'YYYY-MM-DD', true);
+    return momentDate.isValid() ? momentDate : null;
+}
