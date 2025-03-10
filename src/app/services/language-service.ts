@@ -1,15 +1,16 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { DateAdapter } from '@angular/material/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs';
 import { setLanguage } from '../state/language/language.actions';
 import { selectCurrentLanguage } from '../state/language/language.selectors';
+import { Language_EN } from '../app.const';
 
 @Injectable({
     providedIn: 'root'
 })
 export class LanguageService {
-    private currentLanguageSubject = new BehaviorSubject<string>('EN');
+    private currentLanguageSubject = new BehaviorSubject<string>(Language_EN);
     currentLanguage$ = this.currentLanguageSubject.asObservable();
 
     constructor(private dateAdapter: DateAdapter<any>, private store: Store) {

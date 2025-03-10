@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
@@ -16,7 +16,7 @@ import { stagger60ms } from '@vex/animations/stagger.animation';
 import { fadeInUp400ms } from '@vex/animations/fade-in-up.animation';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LanguageService } from 'src/app/services/language-service';
-import { getDateForDatepicker, getDateRequest } from 'src/app/custom-date-adapter';
+import { CustomDateAdapter, getDateForDatepicker, getDateRequest } from 'src/app/custom-date-adapter';
 import { DateInputDirective } from 'src/app/date-input.directive';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
@@ -25,6 +25,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatDividerModule } from '@angular/material/divider';
 import { defaultItemName } from 'src/app/app.default-itemnm'
 import * as Const from 'src/app/app.const';
+import { MessageService } from 'src/app/services/messages.service';
 
 @Component({
     selector: 'vex-student-regist',
@@ -58,6 +59,10 @@ export class StudentRegistUpdateComponent implements OnInit, AfterViewInit {
     studentForm: FormGroup;
     mode: typeof Const.MODE_INS | typeof Const.MODE_UPD = Const.MODE_INS;
     defaultItemName = defaultItemName;
+    formItemName: any[] = [];
+    currentDateFormat: string;
+    dateMessage: string;
+
 
     constructor(
         private fb: FormBuilder,
@@ -67,11 +72,16 @@ export class StudentRegistUpdateComponent implements OnInit, AfterViewInit {
         private languageService: LanguageService,
         @Inject(MAT_DIALOG_DATA) public studentParams: any | undefined,
         private dialogRef: MatDialogRef<StudentRegistUpdateComponent>,
+        private cd: ChangeDetectorRef,
+        private dateAdapter: CustomDateAdapter,
+        private messageService: MessageService
     ) {
         // Kiểm tra localStorage để set ngôn ngữ mặc định
         this.currentLanguage$ = this.languageService.currentLanguage$;
         this.currentLanguage$.subscribe(language => {
+            this.accessInfo.language = language;
             this.currentLanguage = language;
+            this.fnGetFormItemName();
         });
 
         this.studentForm = this.fb.group({
@@ -88,7 +98,27 @@ export class StudentRegistUpdateComponent implements OnInit, AfterViewInit {
             studentId: [{ value: null, disabled: true }],
             studentName: ['']
         });
+
+        this.currentDateFormat = this.dateAdapter.getCurrentDateFormat();
+        this.dateMessage = this.messageService.getMessage("NOR_ERR_003");
     }
+
+    fnGetFormItemName(): void {
+        let request = {
+            accessInfo: this.accessInfo.getAll(),
+            screenId: 'STUDENT_ADD'
+        };
+
+        this.webService.callWs('getFormItemNm', request,
+            (response) => {
+                this.formItemName = response.listFormItemName;
+                this.cd.markForCheck();
+            },
+            (error) => {
+                console.error(error);
+            }).subscribe();
+    }
+
     ngAfterViewInit(): void {
         setTimeout(() => {
             this.studentNameInput.nativeElement.focus();
@@ -167,7 +197,7 @@ export class StudentRegistUpdateComponent implements OnInit, AfterViewInit {
             studentId: { value: null, disabled: true },
             studentName: ''
         });
-        this.studentForm.get('studentId')?.enable();
+        this.studentForm.get('studentId')?.disable();
     }
 
     save() {

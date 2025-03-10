@@ -40,6 +40,14 @@ export class CustomDateAdapter extends MomentDateAdapter {
         if (!value) return null;
         return moment(value, this.dateFormat, true).isValid() ? moment(value, this.dateFormat) : null;
     }
+
+    /**
+     * Lấy định dạng ngày tháng hiện tại
+     * @returns string
+     */
+    getCurrentDateFormat(): string {
+        return this.dateFormat;
+    }
 }
 
 /**
@@ -63,3 +71,4 @@ export function getDateForDatepicker(date: string): moment.Moment | null {
     const momentDate = moment(date, 'YYYY-MM-DD', true);
     return momentDate.isValid() ? momentDate : null;
 }
+

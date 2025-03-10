@@ -22,8 +22,8 @@ import { languageReducer } from './state/language/language.reducer';
 import { AuthInterceptor } from './auth.interceptor';
 import { MAT_DATE_LOCALE, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { CUSTOM_DATE_FORMATS, CustomDateAdapter } from './custom-date-adapter';
-import { CustomPaginator } from 'src/custom-pagination';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { CustomPaginatorIntl } from 'src/custom-pagination';
 
 
 
@@ -97,6 +97,6 @@ export const appConfig: ApplicationConfig = {
         { provide: MAT_DATE_LOCALE, useValue: 'EN' }, // Mặc định là English
         { provide: DateAdapter, useClass: CustomDateAdapter },
         { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS },
-        { provide: MatPaginatorIntl, useFactory: CustomPaginator }
+        { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl }
     ]
 };

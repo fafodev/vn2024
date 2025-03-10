@@ -5,12 +5,12 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { Language } from 'src/app/app.const';
+import { Language, Language_EN, Language_JP } from 'src/app/app.const';
 import { IObjectString } from 'src/app/app.interface';
 import { selectCurrentLanguage } from 'src/app/state/language/language.selectors';
 
 export const HeaderNotify: IObjectString = {
-    'EN': {
+    Language_EN: {
         info: "Successfully",
         error: "Error",
         warning: "Warning",
@@ -18,7 +18,7 @@ export const HeaderNotify: IObjectString = {
         ok: "OK",
         cancel: "Cancel"
     },
-    'JP': {
+    Language_JP: {
         info: "情報",
         error: "エラー",
         warning: "警告",
@@ -26,7 +26,7 @@ export const HeaderNotify: IObjectString = {
         ok: "確認",
         cancel: "キャンセル"
     },
-    'VI': {
+    Language_VI: {
         info: "Thành công",
         error: "Lỗi",
         warning: "Cảnh báo",
@@ -45,7 +45,7 @@ export const HeaderNotify: IObjectString = {
 })
 export class NotifyModalComponent {
     currentLanguage$: Observable<string>;
-    currentLanguage: Language = 'EN';
+    currentLanguage: Language = Language_EN;
     fontIconLoaded: boolean = false;
 
     constructor(

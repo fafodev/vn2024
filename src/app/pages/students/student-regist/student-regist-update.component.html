@@ -3,10 +3,10 @@
         <!-- <img *ngIf="form.controls.imageSrc.value" [src]="form.controls.imageSrc.value" class="avatar mr-5" /> -->
 
         <h2 *ngIf="isUpdateMode() && studentForm.controls['studentName'].value" class="headline m-0 flex-auto">
-            {{ studentForm.controls['studentName'].value }}
+            {{formItemName[1]?.FORMITEMNAME + " " + studentForm.controls['studentName'].value }}
         </h2>
         <h2 *ngIf="isCreateMode()" class="headline m-0 flex-auto">
-            New Customer
+            {{formItemName[0]?.FORMITEMNAME}}
         </h2>
 
         <button [matMenuTriggerFor]="settingsMenu" class="text-secondary" mat-icon-button type="button">
@@ -23,16 +23,17 @@
     <div [formGroup]="studentForm" class="px-6 py-4 flex flex-col">
         <div class="flex flex-col sm:flex-row sm:gap-4">
             <mat-form-field class="flex-auto">
-                <mat-label>MÃ HỌC SINH</mat-label>
-                <input required #studentIdInput matInput placeholder="Nhập mã học sinh" formControlName="studentId" />
+                <mat-label>{{formItemName[14]?.FORMITEMNAME}}</mat-label>
+                <input required #studentIdInput matInput placeholder="{{formItemName[14]?.FORMPLACEHOLDER}}"
+                    formControlName="studentId" />
                 <mat-error
                     *ngIf="studentForm.controls['studentId'].hasError('required')">{{defaultItemName[currentLanguage]['error']}}
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field class="flex-auto">
-                <mat-label>HỌ VÀ TÊN HỌC SINH</mat-label>
-                <input required #studentNameInput matInput placeholder="Nhập tên học sinh"
+                <mat-label>{{formItemName[15]?.FORMITEMNAME}}</mat-label>
+                <input required #studentNameInput matInput placeholder="{{formItemName[15]?.FORMPLACEHOLDER}}"
                     formControlName="studentName" />
                 <mat-error
                     *ngIf="studentForm.controls['studentName'].hasError('required')">{{defaultItemName[currentLanguage]['error']}}
@@ -43,8 +44,9 @@
         <div class="flex flex-col sm:flex-row sm:gap-4">
 
             <mat-form-field class="flex-auto">
-                <mat-label>VP TUYỂN SINH</mat-label>
-                <mat-select required placeholder="Chọn văn phòng tuyển sinh" formControlName="admissionsOffice">
+                <mat-label>{{formItemName[4]?.FORMITEMNAME}}</mat-label>
+                <mat-select required placeholder="{{formItemName[4]?.FORMPLACEHOLDER}}"
+                    formControlName="admissionsOffice">
                     <ng-container *ngFor="let item of listAdmissionsOffices">
                         <mat-option [value]="item.OFFICE_ID">{{ item['OFFICE_NAME'] }}</mat-option>
                     </ng-container>
@@ -55,8 +57,9 @@
             </mat-form-field>
 
             <mat-form-field class="flex-auto">
-                <mat-label>VP ĐÀO TẠO</mat-label>
-                <mat-select required placeholder="Chọn văn phòng đào tạo" formControlName="trainingOffice">
+                <mat-label>{{formItemName[5]?.FORMITEMNAME}}</mat-label>
+                <mat-select required placeholder="{{formItemName[5]?.FORMPLACEHOLDER}}"
+                    formControlName="trainingOffice">
                     <ng-container *ngFor="let item of listTrainingOffices">
                         <mat-option [value]="item.OFFICE_ID">{{ item['OFFICE_NAME'] }}</mat-option>
                     </ng-container>
@@ -83,8 +86,8 @@
 
         <div class="flex flex-col sm:flex-row sm:gap-4">
             <mat-form-field class="flex-auto">
-                <mat-label>TRƯỜNG TIẾNG</mat-label>
-                <mat-select placeholder="Chọn trường tiếng" formControlName="languageSchool">
+                <mat-label>{{formItemName[7]?.FORMITEMNAME}}</mat-label>
+                <mat-select placeholder="{{formItemName[7]?.FORMPLACEHOLDER}}" formControlName="languageSchool">
                     <ng-container *ngFor="let item of listSchools">
                         <mat-option [value]="item.SCHOOL_ID">{{ item['SCHOOL_NAME'] }}</mat-option>
                     </ng-container>
@@ -97,8 +100,8 @@
 
         <div class="flex flex-col sm:flex-row sm:gap-4">
             <mat-form-field class="flex-auto">
-                <mat-label>LỘ TRÌNH BAY</mat-label>
-                <mat-select required placeholder="Chọn lộ trình bay" formControlName="flightRoute">
+                <mat-label>{{formItemName[8]?.FORMITEMNAME}}</mat-label>
+                <mat-select required placeholder="{{formItemName[8]?.FORMPLACEHOLDER}}" formControlName="flightRoute">
                     <ng-container *ngFor="let item of listFlights">
                         <mat-option [value]="item.FLIGHT_ID">{{ item['FLIGHT_ROUTE'] }}</mat-option>
                     </ng-container>
@@ -109,8 +112,9 @@
             </mat-form-field>
 
             <mat-form-field class="flex-auto">
-                <mat-label>ĐOÀN NHẬP CẢNH</mat-label>
-                <input required matInput placeholder="Nhập tên đoàn nhập cảnh " formControlName="entryGroup" />
+                <mat-label>{{formItemName[9]?.FORMITEMNAME}}</mat-label>
+                <input required matInput placeholder="{{formItemName[9]?.FORMPLACEHOLDER}}"
+                    formControlName="entryGroup" />
                 <mat-error
                     *ngIf="studentForm.controls['entryGroup'].hasError('required')">{{defaultItemName[currentLanguage]['error']}}
                 </mat-error>
@@ -119,28 +123,26 @@
 
         <div class="flex flex-col sm:flex-row sm:gap-4">
             <mat-form-field class="flex-auto">
-                <mat-label>NGÀY XUẤT CẢNH</mat-label>
-                <input required matInput [matDatepicker]="departureDate" placeholder="Nhập ngày xuất cảnh"
-                    formControlName="departureDate" appDateInput />
+                <mat-label>{{formItemName[10]?.FORMITEMNAME}}</mat-label>
+                <input required matInput [matDatepicker]="departureDate"
+                    placeholder="{{formItemName[10]?.FORMPLACEHOLDER}}" formControlName="departureDate" appDateInput />
                 <mat-datepicker-toggle [for]="departureDate" matIconSuffix></mat-datepicker-toggle>
                 <mat-datepicker #departureDate></mat-datepicker>
                 <mat-error *ngIf="studentForm.get('departureDate')?.hasError('invalidDate')">
-                    Định dạng ngày không hợp lệ. Định dạng đúng là
-                    {{ currentLanguage === 'JP' ? 'YYYY/MM/DD' : 'DD/MM/YYYY' }}.
+                    {{dateMessage.replace("%1", currentDateFormat)}}
                 </mat-error>
                 <mat-error
                     *ngIf="studentForm.controls['departureDate'].hasError('required')">{{defaultItemName[currentLanguage]['error']}}
                 </mat-error>
             </mat-form-field>
             <mat-form-field class="flex-auto">
-                <mat-label>NGÀY NHẬP CẢNH</mat-label>
-                <input required matInput [matDatepicker]="formDatepickerRef1" placeholder="Nhập ngày nhập cảnh"
-                    formControlName="entryDate" appDateInput />
+                <mat-label>{{formItemName[11]?.FORMITEMNAME}}</mat-label>
+                <input required matInput [matDatepicker]="formDatepickerRef1"
+                    placeholder="{{formItemName[11]?.FORMPLACEHOLDER}}" formControlName="entryDate" appDateInput />
                 <mat-datepicker-toggle [for]="formDatepickerRef1" matIconSuffix></mat-datepicker-toggle>
                 <mat-datepicker #formDatepickerRef1></mat-datepicker>
                 <mat-error *ngIf="studentForm.get('entryDate')?.hasError('invalidDate')">
-                    Định dạng ngày không hợp lệ. Định dạng đúng là
-                    {{ currentLanguage === 'JP' ? 'YYYY/MM/DD' : 'DD/MM/YYYY' }}.
+                    {{dateMessage.replace("%1", currentDateFormat)}}
                 </mat-error>
                 <mat-error
                     *ngIf="studentForm.controls['entryDate'].hasError('required')">{{defaultItemName[currentLanguage]['error']}}
@@ -150,8 +152,9 @@
 
         <div class="flex flex-col sm:flex-row sm:gap-4">
             <mat-form-field class="flex-auto">
-                <mat-label>ĐĂNG KÝ NƠI Ở</mat-label>
-                <mat-select required placeholder="Chọn nơi ở đã đăng ký" formControlName="registeredDormitory">
+                <mat-label>{{formItemName[12]?.FORMITEMNAME}}</mat-label>
+                <mat-select required placeholder="{{formItemName[12]?.FORMPLACEHOLDER}}"
+                    formControlName="registeredDormitory">
                     <ng-container *ngFor="let item of listDormitories">
                         <mat-option [value]="item.DORMITORY_ID">{{ item['DORMITORY_NAME'] }}</mat-option>
                     </ng-container>
@@ -162,8 +165,9 @@
             </mat-form-field>
 
             <mat-form-field class="flex-auto">
-                <mat-label>ĐĂNG KÝ DỊCH VỤ</mat-label>
-                <mat-select required placeholder="Chọn dịch vụ đã đăng ký" formControlName="registeredService" multiple>
+                <mat-label>{{formItemName[13]?.FORMITEMNAME}}</mat-label>
+                <mat-select required placeholder="{{formItemName[13]?.FORMPLACEHOLDER}}"
+                    formControlName="registeredService" multiple>
                     <ng-container *ngFor="let item of listServices">
                         <mat-option [value]="item.SERVICE_ID">{{ item['SERVICE_NAME'] }}</mat-option>
                     </ng-container>
@@ -178,13 +182,13 @@
 
 
         <mat-dialog-actions align="end">
-            <button mat-button mat-dialog-close type="button">Cancel</button>
-            <button mat-button (click)="resetForm()" type="button">Reset</button>
+            <button mat-button mat-dialog-close type="button">{{formItemName[21]?.FORMITEMNAME}}</button>
+            <button mat-button (click)="resetForm()" type="button">{{formItemName[22]?.FORMITEMNAME}}</button>
             <button *ngIf="isCreateMode()" (click)="save()" color="primary" mat-flat-button type="submit">
-                Create Customer
+                {{formItemName[16]?.FORMITEMNAME}}
             </button>
             <button *ngIf="isUpdateMode()" (click)="save()" color="primary" mat-flat-button type="submit">
-                Update Customer
+                {{formItemName[17]?.FORMITEMNAME}}
             </button>
         </mat-dialog-actions>
     </div>
@@ -192,16 +196,16 @@
 <mat-menu #settingsMenu="matMenu" xPosition="before" yPosition="below">
     <button mat-menu-item>
         <mat-icon svgIcon="mat:print"></mat-icon>
-        <span>Print</span>
+        <span>{{formItemName[18]?.FORMITEMNAME}}</span>
     </button>
 
     <button mat-menu-item>
         <mat-icon svgIcon="mat:download"></mat-icon>
-        <span>Export</span>
+        <span>{{formItemName[19]?.FORMITEMNAME}}</span>
     </button>
 
     <button mat-menu-item>
         <mat-icon svgIcon="mat:delete"></mat-icon>
-        <span>Delete</span>
+        <span>{{formItemName[20]?.FORMITEMNAME}}</span>
     </button>
 </mat-menu>

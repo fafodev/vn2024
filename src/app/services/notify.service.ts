@@ -17,7 +17,7 @@ export class NotifyService {
                 type: type
             },
             disableClose: true, // Prevent closing the modal when clicking outside
-            width: '550px'
+            width: '50%'
         });
 
         dialogRef.afterClosed().subscribe(result => {

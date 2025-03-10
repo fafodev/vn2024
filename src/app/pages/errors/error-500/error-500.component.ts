@@ -7,17 +7,18 @@ import { Observable } from 'rxjs';
 import { Language } from 'src/app/app.const';
 import { AccessInfoService } from 'src/app/services/access-info.service';
 import { selectCurrentLanguage } from 'src/app/state/language/language.selectors';
+import { Language_EN, Language_VI, Language_JP } from 'src/app/app.const';
 
-const backToHomeLabel = {
-    'EN': {
+const backToHomeLabel: any = {
+    Language_EN: {
         backToHome: 'Back To Home',
         systemError: 'An unexpected system error occurred. Please contact the administrator for support.'
     },
-    'JP': {
+    Language_JP: {
         backToHome: 'ホームに戻る',
         systemError: 'システムの予期しないエラーが発生しました。サポートが必要な場合は、管理者に連絡してください。'
     },
-    'VI': {
+    Language_VI: {
         backToHome: 'Trở về trang chủ',
         systemError: 'Phát sinh lỗi ngoại lệ ngoài giả định của hệ thống, vui lòng liên hệ quản trị viên để được hỗ trợ.'
     }

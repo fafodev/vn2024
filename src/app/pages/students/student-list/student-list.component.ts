@@ -21,7 +21,7 @@ import { VexSecondaryToolbarComponent } from '@vex/components/vex-secondary-tool
 import { VexBreadcrumbsComponent } from '@vex/components/vex-breadcrumbs/vex-breadcrumbs.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LanguageService } from 'src/app/services/language-service';
-import { getDateRequest } from 'src/app/custom-date-adapter';
+import { CustomDateAdapter, getDateRequest } from 'src/app/custom-date-adapter';
 import { DateInputDirective } from 'src/app/date-input.directive';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
@@ -36,6 +36,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { pageSize, pageSizeOptions } from 'src/app/app.const';
 import { StudentRegistUpdateComponent } from '../student-regist/student-regist-update.component';
 import { MessageService } from 'src/app/services/messages.service';
+import { th } from 'date-fns/locale';
 
 @Component({
     selector: 'vex-student-list',
@@ -57,33 +58,50 @@ import { MessageService } from 'src/app/services/messages.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [stagger60ms, fadeInUp400ms],
 })
-export class StudentListComponent implements OnInit, AfterViewInit {
+export class StudentListComponent implements OnInit {
     currentLanguage$: Observable<string> | undefined;
     currentLanguage: string = "";
+    currentDateFormat: string = "";
     listFlights: any[] = [];
     listSchools: any[] = [];
     listTrainingOffices: any[] = [];
     listDormitories: any[] = [];
     listServices: any[] = [];
     listAdmissionsOffices: any[] = [];
+    formItemName: any[] = [];
     studentForm: FormGroup;
+    crumbs: any[] = [];
+    dateMessage = "";
+
+    columns: TableColumn<any>[] = [];
+    dataSource!: MatTableDataSource<any>;
+    selection = new SelectionModel<any>(true, []);
+    searchCtrl = new UntypedFormControl();
+
+    @ViewChild(MatPaginator, { static: true }) paginator?: MatPaginator;
+    @ViewChild(MatSort, { static: true }) sort?: MatSort;
+
+    private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
     constructor(
         private router: Router,
         private fb: FormBuilder,
         private cd: ChangeDetectorRef,
         private store: Store,
-        private readonly webService: WebServiceService,
-        private readonly accessInfo: AccessInfoService,
+        private webService: WebServiceService,
+        private accessInfo: AccessInfoService,
         private notifyService: NotifyService,
         private languageService: LanguageService,
         private messageService: MessageService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private dateAdapter: CustomDateAdapter
     ) {
         // Kiểm tra localStorage để set ngôn ngữ mặc định
         this.currentLanguage$ = this.languageService.currentLanguage$;
         this.currentLanguage$.subscribe(language => {
             this.currentLanguage = language;
+            this.accessInfo.language = language;
+            this.fnGetFormItemName();
         });
 
         this.studentForm = this.fb.group({
@@ -100,6 +118,31 @@ export class StudentListComponent implements OnInit, AfterViewInit {
             studentId: [''],
             studentName: ['']
         });
+
+        this.currentDateFormat = this.dateAdapter.getCurrentDateFormat();
+        this.dateMessage = this.messageService.getMessage("NOR_ERR_003");
+    }
+
+    fnGetFormItemName(): void {
+        let request = {
+            accessInfo: this.accessInfo.getAll(),
+            screenId: 'STUDENT_LIST'
+        };
+
+        this.webService.callWs('getFormItemNm', request,
+            (response) => {
+                this.formItemName = response.listFormItemName;
+                this.crumbs = [];
+                this.crumbs.push(response.listFormItemName[1]?.FORMITEMNAME);
+                this.crumbs.push(response.listFormItemName[2]?.FORMITEMNAME);
+
+                this.fnInitTable();
+
+                this.cd.markForCheck();
+            },
+            (error) => {
+                console.error(error);
+            }).subscribe();
     }
 
     ngOnInit(): void {
@@ -107,6 +150,8 @@ export class StudentListComponent implements OnInit, AfterViewInit {
     }
 
     fnInit(): void {
+        //this.fnGetFormItemName();
+
         let request = {
             accessInfo: this.accessInfo.getAll()
         };
@@ -132,12 +177,10 @@ export class StudentListComponent implements OnInit, AfterViewInit {
                     this.listAdmissionsOffices = response.listAdmissionsOffices;
                 }
             },
-            () => {
-                console.error('Error occurred');
+            (error) => {
+                console.error(error);
             }).subscribe();
     }
-
-
 
     resetForm(): void {
         this.studentForm.reset({
@@ -223,14 +266,18 @@ export class StudentListComponent implements OnInit, AfterViewInit {
                     }
                 }
             },
-            () => { }).subscribe();
+            (error) => {
+                console.error(error);
+            }).subscribe();
     }
 
 
     subject$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
     data$: Observable<any[]> = this.subject$.asObservable();
 
-    ngAfterViewInit() {
+    fnInitTable() {
+        this.getColumnConfig();
+
         this.dataSource = new MatTableDataSource();
 
         this.data$.pipe(filter<any[]>(Boolean)).subscribe((listStudents) => {
@@ -250,6 +297,8 @@ export class StudentListComponent implements OnInit, AfterViewInit {
         if (this.sort) {
             this.dataSource.sort = this.sort;
         }
+
+
     }
 
     downloadExcel() {
@@ -265,17 +314,10 @@ export class StudentListComponent implements OnInit, AfterViewInit {
                 width: '80%'
             })
             .afterClosed()
-            .subscribe((student: any) => {
-                /**
-                 * Student is the updated customer (if the user pressed Save - otherwise it's null)
-                 */
-                if (student) {
-                    /**
-                     * Here we are updating our local array.
-                     * You would probably make an HTTP request here.
-                     */
-                    this.listStudents.unshift(student);
-                    this.subject$.next(this.listStudents);
+            .subscribe((result: any) => {
+                if (result && result.isSuccessfull) {
+                    this.notifyService.info(this.messageService.getMessage("NOR_INF_001"), null);
+                    this.search();
                 }
             });
     }
@@ -288,21 +330,10 @@ export class StudentListComponent implements OnInit, AfterViewInit {
                 width: '80%'
             })
             .afterClosed()
-            .subscribe((updatedStudent) => {
-                /**
-                 * Student is the updated customer (if the user pressed Save - otherwise it's null)
-                 */
-                console.log('updatedStudent:', updatedStudent);
-                if (updatedStudent) {
-                    /**
-                     * Here we are updating our local array.
-                     * You would probably make an HTTP request here.
-                     */
-                    const index = this.listStudents.findIndex(
-                        (existingStudent) => existingStudent.id === updatedStudent.id
-                    );
-                    this.listStudents[index] = updatedStudent;
-                    this.subject$.next(this.listStudents);
+            .subscribe((result) => {
+                if (result && result.isSuccessfull) {
+                    this.notifyService.info(this.messageService.getMessage("NOR_INF_002"), null);
+                    this.search();
                 }
             });
     }
@@ -325,12 +356,14 @@ export class StudentListComponent implements OnInit, AfterViewInit {
         this.webService.callWs('student-delete', request,
             (response) => {
                 if (response && response.delCnt > 0) {
-                    this.notifyService.info('Delete successfully', null);
+                    this.notifyService.info(this.messageService.getMessage("NOR_INF_003"), null);
                     this.selection.clear();
                     this.search();
                 }
             },
-            () => { }).subscribe();
+            (error) => {
+                console.error(error);
+            }).subscribe();
     }
 
     downloadXls(listStudents: any[]) {
@@ -402,78 +435,74 @@ export class StudentListComponent implements OnInit, AfterViewInit {
         this.subject$.next(this.listStudents);
     }
 
-    @Input()
-    columns: TableColumn<any>[] = [
-        {
-            label: 'Checkbox',
-            property: 'checkbox',
-            type: 'checkbox',
-            visible: true
-        },
-        { label: 'Actions', property: 'actions', type: 'button', visible: true },
-        {
-            label: 'ID',
-            property: 'STUDENT_ID',
-            type: 'text',
-            visible: true
-        }, {
-            label: 'Name',
-            property: 'FULL_NAME',
-            type: 'text',
-            visible: true,
-            cssClasses: ['font-medium']
-        },
-        {
-            label: 'School Name',
-            property: 'SCHOOL_NAME',
-            type: 'text',
-            visible: true,
-            cssClasses: ['font-medium']
-        },
-        {
-            label: 'VP Tuyển sinh',
-            property: 'ADMISSIONS_OFFICE_NAME',
-            type: 'text',
-            visible: true,
-            cssClasses: ['font-medium']
-        },
-        {
-            label: 'VPĐT',
-            property: 'TRAINING_OFFICE_NAME',
-            type: 'text',
-            visible: true,
-            cssClasses: ['font-medium']
-        },
-        {
-            label: 'Loại KTX',
-            property: 'DORMITORY_TYPE_NAME',
-            type: 'text',
-            visible: true,
-            cssClasses: ['font-medium']
-        },
-        {
-            label: 'Địa chỉ KTX',
-            property: 'DORMITORY_ADDRESS',
-            type: 'text',
-            visible: true,
-            cssClasses: ['font-medium']
-        },
-        {
-            label: 'Dịch vụ',
-            property: 'SERVICES_NAME',
-            type: 'labels',
-            visible: true,
-            cssClasses: ['font-medium']
-        }
-    ];
-    dataSource!: MatTableDataSource<any>;
-    selection = new SelectionModel<any>(true, []);
-    searchCtrl = new UntypedFormControl();
+    getColumnConfig() {
+        let columnsConfig: TableColumn<any>[] = [
+            {
+                label: 'Checkbox',
+                property: 'checkbox',
+                type: 'checkbox',
+                visible: true
+            },
+            { label: 'Actions', property: 'actions', type: 'button', visible: true },
+            {
+                label: this.formItemName[14]?.FORMITEMNAME,
+                property: 'STUDENT_ID',
+                type: 'text',
+                visible: true
+            }, {
+                label: this.formItemName[15]?.FORMHINT,
+                property: 'FULL_NAME',
+                type: 'text',
+                visible: true,
+                cssClasses: ['font-medium']
+            },
+            {
+                label: this.formItemName[7]?.FORMITEMNAME,
+                property: 'SCHOOL_NAME',
+                type: 'text',
+                visible: true,
+                cssClasses: ['font-medium']
+            },
+            {
+                label: this.formItemName[4]?.FORMHINT,
+                property: 'ADMISSIONS_OFFICE_NAME',
+                type: 'text',
+                visible: true,
+                cssClasses: ['font-medium']
+            },
+            {
+                label: this.formItemName[5]?.FORMHINT,
+                property: 'TRAINING_OFFICE_NAME',
+                type: 'text',
+                visible: true,
+                cssClasses: ['font-medium']
+            },
+            {
+                label: this.formItemName[29]?.FORMITEMNAME,
+                property: 'DORMITORY_TYPE_NAME',
+                type: 'text',
+                visible: true,
+                cssClasses: ['font-medium']
+            },
+            {
+                label: this.formItemName[30]?.FORMITEMNAME,
+                property: 'DORMITORY_ADDRESS',
+                type: 'text',
+                visible: true,
+                cssClasses: ['font-medium']
+            },
+            {
+                label: this.formItemName[13]?.FORMITEMNAME,
+                property: 'SERVICES_NAME',
+                type: 'labels',
+                visible: true,
+                cssClasses: ['font-medium']
+            }
+        ];
 
-    @ViewChild(MatPaginator, { static: true }) paginator?: MatPaginator;
-    @ViewChild(MatSort, { static: true }) sort?: MatSort;
+        this.columns = columnsConfig;
+    }
 
-    private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
     get visibleColumns() {
         return this.columns

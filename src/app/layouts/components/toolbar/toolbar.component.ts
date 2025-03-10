@@ -31,6 +31,8 @@ import { setLanguage } from 'src/app/state/language/language.actions';
 import { NavigationLoaderService } from 'src/app/core/navigation/navigation-loader.service';
 import { AppFunctionService } from 'src/app/services/app-function.service';
 import { LanguageService } from 'src/app/services/language-service';
+import { AccessInfoService } from 'src/app/services/access-info.service';
+import { Language_EN, Language_VI, Language_JP } from 'src/app/app.const';
 
 @Component({
     selector: 'vex-toolbar',
@@ -53,6 +55,10 @@ import { LanguageService } from 'src/app/services/language-service';
     ]
 })
 export class ToolbarComponent implements OnInit {
+    Language_EN = Language_EN;
+    Language_JP = Language_JP;
+    Language_VI = Language_VI;
+
     currentLanguage$: Observable<string>;
     currentLanguage: string = "";
 
@@ -92,7 +98,8 @@ export class ToolbarComponent implements OnInit {
         private readonly store: Store,
         private readonly router: Router,
         private readonly appFunctionService: AppFunctionService,
-        private readonly languageService: LanguageService
+        private readonly languageService: LanguageService,
+        private accessInfo: AccessInfoService
     ) {
         this.currentLanguage$ = this.store.select(selectCurrentLanguage);
         this.currentLanguage$.subscribe(language => {
@@ -156,6 +163,7 @@ export class ToolbarComponent implements OnInit {
 
     onLanguageMenuChange(language: string) {
         this.languageService.setLanguage(language);
+        this.accessInfo.language = language;
         // reload menu
         this.appFunctionService.reloadListFunction();
     }

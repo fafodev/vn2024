@@ -6,11 +6,11 @@ import { NgFor } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'vex-breadcrumbs',
-  template: `
+    selector: 'vex-breadcrumbs',
+    template: `
     <div class="flex items-center gap-2">
       <vex-breadcrumb>
-        <a [routerLink]="['/']">
+        <a [routerLink]="['/dashboards/top']">
           <mat-icon svgIcon="mat:home" class="icon-sm"></mat-icon>
         </a>
       </vex-breadcrumb>
@@ -22,11 +22,11 @@ import { MatIconModule } from '@angular/material/icon';
       </ng-container>
     </div>
   `,
-  standalone: true,
-  imports: [VexBreadcrumbComponent, RouterLink, NgFor, MatIconModule]
+    standalone: true,
+    imports: [VexBreadcrumbComponent, RouterLink, NgFor, MatIconModule]
 })
 export class VexBreadcrumbsComponent {
-  @Input() crumbs: string[] = [];
+    @Input() crumbs: string[] = [];
 
-  trackByValue = trackByValue;
+    trackByValue = trackByValue;
 }

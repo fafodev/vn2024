@@ -23,3 +23,7 @@ export const pageSize = 20;
 
 export const MODE_UPD = 'update';
 export const MODE_INS = 'create';
+
+export const Language_JP: Language = 'JP';
+export const Language_EN: Language = 'EN';
+export const Language_VI: Language = 'VI';

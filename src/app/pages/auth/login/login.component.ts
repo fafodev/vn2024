@@ -33,6 +33,7 @@ import { AppFunctionService } from 'src/app/services/app-function.service';
 import { NotifyService } from 'src/app/services/notify.service';
 import { LanguageService } from 'src/app/services/language-service';
 import { MessageService } from 'src/app/services/messages.service';
+import { Language_EN, Language_VI, Language_JP } from 'src/app/app.const';
 
 @Component({
     selector: 'vex-login',
@@ -61,6 +62,9 @@ import { MessageService } from 'src/app/services/messages.service';
     ]
 })
 export class LoginComponent {
+    Language_EN = Language_EN;
+    Language_JP = Language_JP;
+    Language_VI = Language_VI;
     configPanelOpen$: Observable<boolean> = this.layoutService.configPanelOpen$;
     currentLanguage$: Observable<string> | undefined;
 
@@ -99,6 +103,8 @@ export class LoginComponent {
     }
 
     onLanguageMenuChange(language: string) {
+        this.accessInfo.language = language;
+
         this.languageService.setLanguage(language);
     }
 

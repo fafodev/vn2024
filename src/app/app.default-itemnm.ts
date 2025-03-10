@@ -24,6 +24,7 @@ class DefaultItemName {
             inputType: '目をクリックして表示を切り替える',
             registerTitle1: 'アカウントをお持ちでない場合は',
             registerTitle2: 'こちらをクリックして作成してください',
+            paginationLabel: '1ページあたりの項目数: ',
         };
 
         this.EN = {
@@ -43,6 +44,7 @@ class DefaultItemName {
             inputType: 'Click the eye to toggle visibility',
             registerTitle1: 'Don\'t have an account?',
             registerTitle2: 'Click here to create one',
+            paginationLabel: 'Items per page: ',
         };
 
         this.VI = {
@@ -62,6 +64,7 @@ class DefaultItemName {
             inputType: 'Nhấn vào biểu tượng mắt để chuyển đổi hiển thị',
             registerTitle1: 'Chưa có tài khoản?',
             registerTitle2: 'Nhấn vào đây để tạo',
+            paginationLabel: 'Số dòng trên trang: ',
         };
     }
 }
