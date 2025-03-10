@@ -304,7 +304,25 @@
                 <button color="primary" mat-flat-button type="button"
                     (click)="downloadExcel()">{{formItemName[25]?.FORMITEMNAME}}</button>
                 <button color="primary" mat-flat-button type="button"
-                    (click)="uploadCsv()">{{formItemName[26]?.FORMITEMNAME}}</button>
+                    (click)="fileInput.click()">{{formItemName[26]?.FORMITEMNAME}}</button>
+                <input hidden (change)="onFileSelected($event)" #fileInput type="file" accept=".xlsx,.xls">
+            </div>
+            <div class="flex justify-end gap-2">
+                <div *ngIf="selectedFile && selectedFile.size > 0"
+                    class="w-1/2 mt-4 mb-2 rounded-full border px-4 py-1 flex items-center hover:bg-hover transition duration-200 ease-in-out cursor-pointer relative"
+                    matRipple>
+
+                    <mat-icon class="flex-none text-primary-600 icon" [fontIcon]="'fa-file-excel'" class="icon"
+                        fontSet="fa"></mat-icon>
+
+                    <p class="flex-auto ml-4 text-sm">{{selectedFile.name}}</p>
+
+                    <p class="text-sm text-secondary mr-2 flex-none">{{convertBytes(selectedFile.size)}}</p>
+                    <button (click)="$event.stopPropagation()" class="flex-none w-8 h-8 p-0 leading-none"
+                        mat-icon-button type="button">
+                        <mat-icon class="icon-sm" svgIcon="mat:close"></mat-icon>
+                    </button>
+                </div>
             </div>
         </div>
 

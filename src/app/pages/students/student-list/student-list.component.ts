@@ -305,7 +305,51 @@ export class StudentListComponent implements OnInit {
         this.executeDownloadXls([]);
     }
 
-    uploadCsv() { }
+    selectedFile: File | null = null;
+    onFileSelected(event: any) {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) {
+            this.selectedFile = input.files[0];
+            console.log('File Name:', this.selectedFile.name);
+            console.log('File Size:', this.selectedFile.size);
+            console.log('File:', this.selectedFile);
+
+            let messageConfirm = this.messageService.getMessage("NOR_INF_006");
+            messageConfirm = messageConfirm.replace("%1", this.selectedFile.name);
+            messageConfirm = messageConfirm.replace("%2", this.convertBytes(this.selectedFile.size));
+
+            this.notifyService.confirm(messageConfirm,
+                () => {
+                    this.uploadFile();
+                }, () => {
+                    this.selectedFile = null;
+                    this.cd.markForCheck();
+                });
+        }
+    }
+
+    uploadFile() {
+        if (!this.selectedFile) {
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append('file', this.selectedFile);
+
+        // Chuyển accessInfo thành JSON và append vào FormData
+        formData.append('accessInfo', JSON.stringify(this.accessInfo.getAll()));
+
+        this.webService.callWebServiceForFileUpload('student-import-xlsx', formData,
+            (response) => {
+                if (response && response.isSuccessfull) {
+                    this.notifyService.info(this.messageService.getMessage("NOR_INF_006"), null);
+                    this.search();
+                }
+            },
+            (error) => {
+                console.error(error);
+            }).subscribe();
+    }
 
     createStudent() {
         this.dialog
@@ -508,5 +552,16 @@ export class StudentListComponent implements OnInit {
         return this.columns
             .filter((column) => column.visible)
             .map((column) => column.property);
+    }
+
+    // Hàm để chuyển đổi dung lượng từ byte sang KB hoặc MB
+    convertBytes(bytes: number): string {
+        if (bytes < 1024 * 1024) {
+            const kb = bytes / 1024;
+            return `${kb.toFixed(2)} KB`;
+        } else {
+            const mb = bytes / (1024 * 1024);
+            return `${mb.toFixed(2)} MB`;
+        }
     }
 }

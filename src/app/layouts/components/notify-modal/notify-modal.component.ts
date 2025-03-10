@@ -10,7 +10,7 @@ import { IObjectString } from 'src/app/app.interface';
 import { selectCurrentLanguage } from 'src/app/state/language/language.selectors';
 
 export const HeaderNotify: IObjectString = {
-    Language_EN: {
+    EN: {
         info: "Successfully",
         error: "Error",
         warning: "Warning",
@@ -18,7 +18,7 @@ export const HeaderNotify: IObjectString = {
         ok: "OK",
         cancel: "Cancel"
     },
-    Language_JP: {
+    JP: {
         info: "情報",
         error: "エラー",
         warning: "警告",
@@ -26,7 +26,7 @@ export const HeaderNotify: IObjectString = {
         ok: "確認",
         cancel: "キャンセル"
     },
-    Language_VI: {
+    VI: {
         info: "Thành công",
         error: "Lỗi",
         warning: "Cảnh báo",
@@ -62,10 +62,6 @@ export class NotifyModalComponent {
             this.okLabel = HeaderNotify[this.currentLanguage].ok;
             this.cancelLabel = HeaderNotify[this.currentLanguage].cancel;
         });
-
-        if (!this.fontIconLoaded) {
-            this.loadFont();
-        }
     }
 
     type: string = this.data.type;
@@ -80,17 +76,5 @@ export class NotifyModalComponent {
 
     okFunction() {
         this.dialogRef.close('ok');
-    }
-
-    loadFont() {
-        this.fontIconLoaded = true;
-        const scriptElem = this.renderer.createElement('script');
-        this.renderer.setAttribute(scriptElem, 'crossorigin', 'anonymous');
-        this.renderer.setAttribute(
-            scriptElem,
-            'src',
-            'https://kit.fontawesome.com/24a46da608.js'
-        );
-        this.renderer.appendChild(this.document?.head, scriptElem);
     }
 }

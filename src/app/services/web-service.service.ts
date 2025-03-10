@@ -164,24 +164,25 @@ export class WebServiceService {
         this.fnWaitScreen(this.SCREEN_MODE_MINUS);
     }
 
-    callWebServiceForFileUpload(serviceName: string, data: any, fncSuccess: (data: any) => void, fncError: () => void): Observable<any> {
+    callWebServiceForFileUpload(serviceName: string, data: any, fncSuccess: (data: any) => void, fncError: (error: any) => void): Observable<any> {
         this.fnWaitScreen(this.SCREEN_MODE_PLUS);
 
-        const url = `${Const.serverHost()}/${Const.projectName}/${serviceName}`;
+        const url = `${Const.serverHost()}/${Const.projectName}/${Const.service}${serviceName}`;
         return this.http.post<any>(url, data, {
             reportProgress: true,
-            observe: 'events'
+            observe: 'events'  // Theo dõi tiến trình upload
         }).pipe(
             map((event: any) => {
-                if (event.type === HttpEventType.Response) {
-                    const response = event.body;
-                    return this.handleResponse(response, fncSuccess);
+                if (event.type === HttpEventType.UploadProgress) {
+                    console.log(`Upload Progress: ${Math.round((100 * event.loaded) / event.total)}%`);
+                } else if (event.type === HttpEventType.Response) {
+                    return this.handleResponse(event.body, fncSuccess);
                 }
                 return of(false);
             }),
             catchError(error => {
                 if (fncError) {
-                    fncError();
+                    fncError(error);
                 } else {
                     this.handleError(error);
                 }
