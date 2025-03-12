@@ -11,7 +11,7 @@ export const service = 'webapi/vijp/';
  * ビルド過程で稼働環境用のサーバー名に置き換え
  */
 export function serverHost(): string {
-    return isDevMode() ? 'http://localhost:8181' : '';
+    return isDevMode() ? 'http://localhost:8080' : '';
 }
 
 export const projectName = 'vijp';

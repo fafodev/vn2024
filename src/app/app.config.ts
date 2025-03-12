@@ -7,7 +7,7 @@ import {
     withInterceptors,
     withInterceptorsFromDi
 } from '@angular/common/http';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withHashLocation, withInMemoryScrolling } from '@angular/router';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -24,6 +24,7 @@ import { MAT_DATE_LOCALE, DateAdapter, MAT_DATE_FORMATS } from '@angular/materia
 import { CUSTOM_DATE_FORMATS, CustomDateAdapter } from './custom-date-adapter';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginatorIntl } from 'src/custom-pagination';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 
 
@@ -35,7 +36,10 @@ export const appConfig: ApplicationConfig = {
             withInMemoryScrolling({
                 anchorScrolling: 'enabled',
                 scrollPositionRestoration: 'enabled'
-            })),
+            }),
+            withHashLocation()
+        ),
+
         provideAnimations(),
         provideHttpClient(withInterceptorsFromDi()),
         provideVex({
@@ -43,7 +47,7 @@ export const appConfig: ApplicationConfig = {
              * The config that will be used by default.
              * This can be changed at runtime via the config panel or using the VexConfigService.
              */
-            config: vexConfigs.ikaros,
+            config: vexConfigs.apollo,
             /**
              * Only themes that are available in the config in tailwind.config.ts should be listed here.
              * Any theme not listed here will not be available in the config panel.
