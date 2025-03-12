@@ -215,8 +215,6 @@ export class StudentListComponent implements OnInit {
      * @param e 
      */
     handlePageEvent(e: PageEvent) {
-        this.pageEvent = e;
-        this.recordsTotal = e.length;
         this.pageSize = e.pageSize;
         this.pageIndex = e.pageIndex;
 
@@ -229,13 +227,8 @@ export class StudentListComponent implements OnInit {
             return;
         }
 
-        // Reset dữ liệu trước khi search
-        this.subject$.next([]);
-
-        // Lấy dữ liệu từ form
         let formData = { ...this.studentForm.value };
 
-        // Chuyển đổi ngày thành định dạng YYYY-MM-DD
         if (formData.departureDate) {
             formData.departureDate = getDateRequest(formData.departureDate);
         }
@@ -243,7 +236,6 @@ export class StudentListComponent implements OnInit {
             formData.entryDate = getDateRequest(formData.entryDate);
         }
 
-        // Tạo request với accessInfo và dữ liệu đã chuyển đổi
         let request = {
             accessInfo: this.accessInfo.getAll(),
             ...formData,
@@ -256,12 +248,18 @@ export class StudentListComponent implements OnInit {
         this.webService.callWs('student-search', request,
             (response) => {
                 if (response) {
-                    console.log('Search Result:', response);
+                    console.log('Total records:', response.recordsTotal); // Debug
+
                     if (response.recordsTotal > 0 && response.listStudents) {
-                        this.recordsTotal = response.recordsTotal;
+                        console.log(this.paginator);
+                        this.recordsTotal = response.recordsTotal; // Cập nhật tổng số bản ghi
                         this.listStudents = response.listStudents;
-                        this.subject$.next(this.listStudents);
+                        this.dataSource.data = this.listStudents;
+                        console.log(this.paginator);
                     } else {
+                        this.listStudents = [];
+                        this.dataSource.data = [];
+                        this.recordsTotal = 0;
                         this.notifyService.error(response.fatalError[0]?.errMsg, null);
                     }
                 }
@@ -289,16 +287,10 @@ export class StudentListComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((value) => this.onFilterChange(value));
 
-        // Khởi tạo phân trang và sắp xếp cho bảng
-        if (this.paginator) {
-            this.dataSource.paginator = this.paginator;
-        }
 
         if (this.sort) {
             this.dataSource.sort = this.sort;
         }
-
-
     }
 
     downloadExcel() {
@@ -341,8 +333,14 @@ export class StudentListComponent implements OnInit {
 
         this.webService.callWebServiceForFileUpload('student-import-xlsx', formData,
             (response) => {
-                if (response && response.isSuccessfull) {
-                    this.notifyService.info(this.messageService.getMessage("NOR_INF_006"), null);
+                if (response) {
+                    let message = this.messageService.getMessage("NOR_INF_005");
+                    message = message.replace("%1", response.numberOfRows);
+                    message = message.replace("%2", response.numberOfRowSuccess);
+                    message = message.replace("%3", response.numberOfRowError);
+                    this.notifyService.info(message, null);
+                    this.selectedFile = null;
+                    this.cd.markForCheck();
                     this.search();
                 }
             },
